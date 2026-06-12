@@ -1,0 +1,31 @@
+{
+  "name": "agent-kernel",
+  "version": "0.1.0",
+  "description": "An integrated reference kernel for agent runtimes: memory, tool routing, governance, wallet limits, and a typed world model, on Node.js built-ins.",
+  "type": "module",
+  "license": "MIT",
+  "engines": {
+    "node": ">=24"
+  },
+  "exports": {
+    ".": "./src/kernel.ts"
+  },
+  "files": [
+    "src",
+    "README.md",
+    "LICENSE"
+  ],
+  "scripts": {
+    "demo": "node demo.ts"
+  },
+  "keywords": [
+    "agent",
+    "ai-agent",
+    "runtime",
+    "kernel",
+    "tool-routing",
+    "governance",
+    "memory",
+    "world-model"
+  ]
+}
