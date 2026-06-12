@@ -1,0 +1,15 @@
+# Dependencies (installed per-guide only for the few external-dep demos)
+node_modules/
+package-lock.json
+pnpm-lock.yaml
+
+# TypeScript build artifacts
+*.tsbuildinfo
+
+# Editor / OS noise
+.DS_Store
+.vscode/
+.idea/
+
+# Internal scan notes — NOT for publication (contains private source references)
+_survey/
