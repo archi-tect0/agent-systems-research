@@ -78,10 +78,13 @@ to be a constant low-cost background signal, not a context-window hog.
 ## Algorithm
 
 ```
-addReflection(wallet, category, content, confidence?, confirmed?):
+addReflection(wallet, category, content, confidence?, confirmed?, supersedesId?):
   insert row { id, wallet, category, content,
                confidence ?? 0.9, confirmed ?? false,
-               updatedAt = now, archivedAt = null }
+               updatedAt = now, archivedAt = null,
+               supersedesId ?? null }
+  if supersedesId:                     # contradiction handling
+    archiveOne(wallet, supersedesId)   # soft-archive the superseded entry, same step
 
 listReflections(wallet, category?, limit):
   return rows WHERE wallet = ? AND archivedAt IS NULL [AND category = ?]
@@ -93,9 +96,9 @@ getReflectiveContext(wallet):                # called every turn
   sorted  = entries sorted by CATEGORY_PRIORITY index
   top     = sorted.slice(0, 8)
 
-  # Use-reinforcement: bump updatedAt on the entries we are injecting,
-  # fire-and-forget so it adds zero latency to the turn.
-  bumpUpdatedAt(top.ids)            # not awaited
+  # Use-reinforcement: bump updatedAt on the ENTIRE candidate set (all 12 warm
+  # entries), not just the displayed top 8 — fire-and-forget, zero added latency.
+  bumpUpdatedAt(entries.ids)        # not awaited
 
   return render(top)               # "REFLECTIVE:\n[CATEGORY] content…"
 
@@ -117,6 +120,16 @@ used** entries (recency via `updatedAt`), then `getReflectiveContext` re-sorts
 *those* by category priority and takes the top 8. So the candidate set is chosen
 by warmth, but the display order within the block is chosen by behavioral
 importance.
+
+**Reinforce the candidate set, not just the displayed block.** The bump targets
+all 12 candidates, not the 8 that survive the category cut. If only the displayed
+top-8 were reinforced, a few permanently high-priority categories (corrections,
+lessons) would win the cut every turn and keep refreshing their own timestamps,
+while warm-but-lower-priority entries — relevant enough to be loaded into the
+candidate set every single turn — would never get bumped, cool off, and be
+pruned by the decay pass despite being in active use. Bumping the whole
+candidate set keeps any entry that is consistently warm enough to be *considered*
+from being starved out by display ordering.
 
 ## How reflections get written
 
@@ -163,18 +176,22 @@ const archived = await decayStaleReflections(store, wallet, 45);
 
 ## Limitations and extensions
 
-- **Per-id bump vs. bulk bump.** The simplest implementation bumps every
-  non-archived row's timestamp on inject, which loses fine-grained pathway
-  information. A precise implementation bumps *only the injected ids* — the
-  reference code does this; production code that batches for performance may
-  approximate.
+- **Bump granularity.** The reference bumps the whole candidate set (the warm
+  entries loaded for the turn), which keeps actively-considered entries warm and
+  avoids display-order starvation. It deliberately does *not* bump every
+  non-archived row (that would erase all pathway information) nor only the
+  displayed ids (that starves the rest of the candidate set). The candidate set
+  is the right granularity: warm enough to be considered ⇒ reinforced.
 - **Decay threshold is global.** 45 days suits a daily-use assistant; a
   rarely-used agent would prune reflections it never had a chance to reinforce.
   The threshold could scale with the user's interaction cadence.
-- **No contradiction handling.** Two reflections can disagree
-  (*"prefers terse"* vs. *"prefers detail"*). This store keeps both and lets the
-  model reconcile them. A reconciliation pass (like the fact reconciliation in
-  guide 06's sibling) could supersede the older one.
+- **Contradiction handling via `supersedesId`.** Two reflections can disagree
+  (*"prefers terse"* vs. *"prefers detail"*). When a reflection cycle writes a
+  new entry that overrides an older, contradictory one, it passes the old entry's
+  id as `supersedesId`: the new row records the back-pointer and the old row is
+  soft-archived in the same step, so only the current belief is injected while the
+  superseded history stays queryable. Detecting *which* prior entry to supersede
+  (the semantic-conflict step) is still left to the writing cycle.
 - **Confidence is written but not used in ordering.** Sorting is purely by
   category priority and warmth. Confidence could weight the per-turn cutoff so
   low-confidence guesses need more reinforcement to stay visible.

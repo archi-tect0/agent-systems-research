@@ -52,17 +52,24 @@ second, and source trust is a tie-breaker rather than a driver.
 Memory *class* carries information the five signals don't. A correction is more
 important than a one-off general memory even when every other signal is equal.
 Rather than fold class into the linear blend, the score is multiplied by
-`0.7 + 0.3 × (priority / 100)`, so class priority modulates the final score by up
-to ±30% without ever being able to fully override the semantic signal — except
-for corrections, which are retrieved on a separate path (see Algorithm) so they
-never depend on cosine distance at all.
+`0.7 + 0.6 × (priority / 100)`, so class priority modulates the final score by
+±30% *centered on a baseline of 1.0 at priority 50*: priority 0 → ×0.7,
+priority 50 → ×1.0, priority 100 → ×1.3. A high-priority class can therefore
+*boost* a memory above the blend, not merely avoid being penalized, while still
+never fully overriding the semantic signal — except for corrections, which are
+retrieved on a separate path (see Algorithm) so they never depend on cosine
+distance at all.
 
 **Why a "session-fresh" boost?**
 Static seed memories (imported at onboarding) and freshly-written
 mid-conversation facts can have identical recency decay curves once a day passes,
-but within a live session the just-written fact must win. A `1.6×` multiplier on
-the recency term for memories touched in the last two hours guarantees
-mid-session facts float above static seeds.
+but within a live session the just-written fact must win. A multiplier on the
+recency term for memories touched in the last two hours guarantees mid-session
+facts float above static seeds. The multiplier is a *linear taper* — `1.6×` at
+the moment of touch, easing down to `1.3×` at the two-hour edge — rather than a
+flat `1.6×` that snaps to `1.0×` the instant the window closes. This avoids a
+score cliff mid-conversation: a fact touched 1h59m ago and one touched 2h01m ago
+score almost the same instead of lurching apart.
 
 **Why "touch on recall"?**
 Recency decay is driven by `lastTouchedAt`, not `createdAt`. Every time a memory
@@ -83,7 +90,9 @@ computeSalience(m):
   recency      = recencyScore(m.lastTouchedAt)
   sourceTrust  = SOURCE_TRUST_MAP[m.source] or 0.6
   priorityNorm = min(1, m.priority / 100)
-  freshBoost   = 1.6 if touched within last 2h else 1.0
+  # linear taper across the 2h window: 1.6 at age 0 → 1.3 at 2h → 1.0 after
+  hoursSince = (now - m.lastTouchedAt) / 1 hour
+  freshBoost = 1.6 - 0.3 * (hoursSince / 2)  if hoursSince <= 2  else 1.0
 
   raw = W_SIM   * m.similarity
       + W_REC   * recency * freshBoost
@@ -91,7 +100,8 @@ computeSalience(m):
       + W_CONF  * m.confidence
       + W_TRUST * sourceTrust
 
-  return raw * (0.7 + 0.3 * priorityNorm)
+  # ±30% centered on 1.0 at priority 50: p0→×0.7, p50→×1.0, p100→×1.3
+  return raw * (0.7 + 0.6 * priorityNorm)
 ```
 
 Two-phase retrieval:
@@ -107,12 +117,16 @@ searchMemory(query, classes, k):
     results += selectCorrections(wallet, limit=10)
 
   # Phase 2 — cosine search for every other requested class.
+  # Over-fetch a wide candidate pool (max(50, k*3)) so a memory that is highly
+  # salient but topically distant isn't dropped by the vector index before its
+  # compound score is ever computed. The pool is scored, then sliced to k.
   if otherClasses not empty:
     vec  = embed(query)
-    hits = vectorSearch(vec, otherClasses, limit=k+8)   # pgvector <=> operator
+    hits = vectorSearch(vec, otherClasses, limit=max(50, k*3))   # pgvector <=> operator
     results += hits with their cosine distance attached
 
-  # Convert distance → similarity, compute compound salience, sort, slice.
+  # Convert distance → similarity, compute compound salience over the FULL pool,
+  # sort, then slice to k.
   ranked = sortByDescending(results, computeSalience).slice(0, k)
   for m in ranked: touchMemory(m.id)     # fire-and-forget recency bump
   return ranked
@@ -190,10 +204,11 @@ const { archived, decayed, promoted } = await consolidateMemories(store, wallet)
 - **Half-life is fixed at 14 days.** Different memory classes plausibly want
   different decay rates (corrections should barely decay; small talk should decay
   fast). The recency function could take the class as a parameter.
-- **The freshness boost is a step function.** A continuous boost
-  (e.g. multiplier that smoothly decays from 1.6 to 1.0 over two hours) would
-  avoid the cliff at exactly two hours, at the cost of a slightly less
-  predictable score.
+- **The freshness boost tapers linearly, then drops.** The boost eases from
+  1.6 to 1.3 across the two-hour window and then falls to 1.0 just past it. This
+  removes the large mid-window cliff but leaves a small residual step (1.3 → 1.0)
+  at the window edge. A fully continuous decay to 1.0 would erase even that, at
+  the cost of a slightly less predictable score near the boundary.
 - **Consolidation promotion is heuristic.** "Touched in the last 3 days" is a
   proxy for "frequently recalled". A true access counter would let promotion key
   off recall *count* rather than recall *recency*.

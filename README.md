@@ -55,96 +55,96 @@ Each guide's "Reference implementation" section lists exactly what it needs. Whe
 
 | # | Guide | Summary |
 |---|-------|---------|
-| 01 | [Fibonacci-Harmonic KDF](./01-fh-kdf/) | A domain-separated key-derivation function combining HKDF with a harmonic mixing schedule. |
-| 02 | [Post-Quantum HKDF](./02-pq-hkdf/) | HKDF built on SHA3-256 for a post-quantum-oriented hash core. |
-| 13 | [Committed Lattice Secret Sharing](./13-fractal-lattice-sharding/) | High-dimensional lattice secret sharing with a SHA-256 commitment that detects silent shard corruption. |
-| 19 | [Hybrid Post-Quantum Identity](./19-hybrid-pqc-identity/) | Zero-interaction enrollment of ML-DSA + SLH-DSA keys shadowing an ECDSA account; dual-signed receipts and hybrid JWTs. |
-| 20 | [SIWE Login with a Passkey Floor](./20-siwe-passkey-floor/) | Wallet sign-in plus a context-bound WebAuthn assertion required for every state-changing operation. |
-| 21 | [Behavioral Continuous Authentication](./21-behavioral-continuous-auth/) | A 9-dimension motion vector with an EMA profile and cosine-similarity step-up auth. |
-| 41 | [Hybrid RSA + Post-Quantum OIDC Signing](./41-hybrid-oidc-pq-signing/) | Standard RS256 JWTs carry a detached ML-DSA-65 signature keyed from the RSA `kid` + secret, so breaking RSA alone cannot forge a token and RS256-only clients still verify. |
-| 43 | [Domain-Isolated Address Aliases](./43-domain-isolated-address-alias/) | Per-domain HKDF derivation yields a distinct deterministic address for every site, making one user unlinkable across sites with no registry. |
-| 51 | [Deterministic Post-Quantum Action Receipts](./51-deterministic-action-receipts/) | Canonical-JSON action hashes signed by a wallet-deterministic post-quantum key, verifiable indefinitely without any server state. |
+| 01 | [Fibonacci-Harmonic Key Derivation Function (FH-KDF)](./01-fh-kdf/) | Standard HKDF-SHA256 is a well-audited, widely-deployed KDF. |
+| 02 | [Post-Quantum HKDF (HKDF-SHA3-256)](./02-pq-hkdf/) | HKDF-SHA256 is the standard key derivation function in most modern systems. |
+| 13 | [Committed Lattice Secret Sharing](./13-fractal-lattice-sharding/) | Shamir Secret Sharing (SSS) splits a secret into *n* shares such that any *k* of them reconstruct it and any *k-1* reveal nothing. |
+| 19 | [Hybrid Post-Quantum Identity](./19-hybrid-pqc-identity/) | An account today is anchored by an ECDSA keypair (secp256k1 — the EVM/Bitcoin curve) or an RSA signing key (OIDC id-tokens). |
+| 20 | [SIWE Login with a Passkey Floor](./20-siwe-passkey-floor/) | Sign-In With Ethereum (SIWE, EIP-4361) authenticates a user by having them sign a structured message with their wallet key. |
+| 21 | [Behavioral Continuous Authentication](./21-behavioral-continuous-auth/) | Authentication is almost always a single gate: pass the login, get a session, then the session is trusted until it expires. |
+| 41 | [Hybrid RSA + Post-Quantum OIDC Token Signing](./41-hybrid-oidc-pq-signing/) | An OpenID Connect provider signs ID tokens with RS256 (RSA + SHA-256). |
+| 43 | [Domain-Isolated Deterministic Address Aliases](./43-domain-isolated-address-alias/) | A user with a single master seed often needs to present an account address to many independent sites — a shop, a forum, a bank portal, a social app. |
+| 51 | [Deterministic Post-Quantum Action Receipts](./51-deterministic-action-receipts/) | When an autonomous agent performs actions on a user's behalf — approving a token transfer, firing an intent, running a scheduled task — there needs to be durable, non-repudiable proof of *what was authorised and executed*. |
 
 ### Wallets and payments
 
 | # | Guide | Summary |
 |---|-------|---------|
-| 15 | [Multi-Chain Shadow Wallet Derivation](./15-multichain-shadow-derivation/) | Deterministically derive BTC, EVM, Solana, and Tron addresses from one identity string + secret via HKDF — no BIP-39 seed. |
-| 16 | [Time-of-Flight Proximity Payment](./16-proximity-payment-tof/) | A relay-resistant "tap to pay" using round-trip time-of-flight over Web Bluetooth / WebNFC. |
-| 17 | [Agent Spend-Limit Wallet](./17-agent-spend-limit-wallet/) | An autonomous hot wallet that auto-executes under a threshold and requires a human approval above it. |
-| 18 | [Multi-Chain Spend Governor](./18-multichain-spend-governor/) | Fail-closed daily spend limits normalizing every chain/token to one base currency via live pricing. |
-| 29 | [Quorum Vault Groups](./29-quorum-vault-groups/) | M-of-N approval with passkey assertions, plus recursive child sub-vaults with autonomous caps that escalate to full quorum. |
-| 32 | [Covenant Dual-Custody](./32-covenant-dual-custody/) | Bind a human-owned proof token to a machine-owned proof token at creation to link a human and an agent identity. |
-| 34 | [Emergency Cross-Chain Sweep](./34-emergency-cross-chain-sweep/) | A panic button that derives a clean wallet and parallel-sweeps funds across every selected chain at once. |
+| 15 | [Multi-Chain Shadow Wallet Derivation (HKDF, no BIP-39 seed)](./15-multichain-shadow-derivation/) | A user authenticates once — with a passkey, a wallet signature, or any other identity proof — and now wants to hold and move assets across several blockchains with completely different key formats and address encodings: - Bitcoin — secp256k1 keys, P2WPKH SegWit (bech32) addresses - Solana — Ed25519 keys, base58 public-key addresses - EVM chains (Ethereum / BNB Chain / Polygon / Base / Arbitrum) — secp256k1 keys, keccak-256 derived 20-byte addresses - TRON — secp256k1 keys, keccak-256 hash + 0x41 version byte + Base58Check The conventional answer is BIP-39 / BIP-44: generate a 12/24-word mnemonic, expand it into a seed, then walk a hardened derivation path per chain. |
+| 16 | [Time-of-Flight Proximity Payment ("Tap to Pay", relay-resistant)](./16-proximity-payment-tof/) | Two people standing next to each other want to exchange value by physically tapping their phones together — the wallet equivalent of a contactless card. |
+| 17 | [Agent Spend-Limit Wallet (autonomous spend with a human approval floor)](./17-agent-spend-limit-wallet/) | An autonomous software agent — an LLM tool-caller, a trading bot, a recurring-payment daemon — needs to *spend money on-chain on its own*. |
+| 18 | [Multi-Chain Spend Governor (velocity limits + fail-closed pricing + guardian freeze)](./18-multichain-spend-governor/) | A wallet holds assets on many chains — Bitcoin, Solana (and its SPL tokens), TRON, and a family of EVM chains — and we want to enforce one coherent spending policy across all of them: - a per-transaction cap (no single transfer larger than X), - a daily cap (no more than Y total across all chains per UTC day), - and a guardian freeze that can halt *every* outbound transfer during an incident. |
+| 29 | [Quorum Vault Groups (M-of-N approval + autonomous child sub-vaults)](./29-quorum-vault-groups/) | A shared vault — a family account, a team treasury, a DAO sub-budget — needs two governance shapes at once: 1. |
+| 32 | [Covenant Dual-Custody (paired human + machine identity NFTs)](./32-covenant-dual-custody/) | When an autonomous agent acts on a user's behalf — signing, spending, proving identity — you want a durable, verifiable record that both the human and the machine were bound together at the moment the relationship was created. |
+| 34 | [Emergency Cross-Chain Sweep](./34-emergency-cross-chain-sweep/) | A wallet is compromised — a seed phrase phished, a malicious approval signed, a device stolen with keys on it. |
 
 ### Agent cognition: memory and tools
 
 | # | Guide | Summary |
 |---|-------|---------|
-| 06 | [Compound Memory Salience Scoring](./06-compound-memory-salience/) | Re-rank vector-search hits by a weighted blend of similarity, recency, emotion, confidence, and trust, with corrections taking hard priority. |
-| 07 | [Reflective Memory](./07-reflective-memory/) | Categorized lessons with use-reinforced sorting — touching a memory warms it and floats it up — plus stale pruning. |
-| 09 | [Intent-Based Tool Schema Selection](./09-intent-based-tool-selection/) | A core tool set plus intent-classified drawers and a name-only index, cutting tool-schema tokens by more than half. |
-| 10 | [Intent-Gated Personal Knowledge Shards](./10-personal-knowledge-shards/) | A structured personal-facts layer gated by intent and provenance, where security paths only trust observed facts. |
-| 33 | [Knowledge Absorber → Zero-Token Vocabulary](./33-knowledge-absorber-sq-vocab/) | Detect knowledge gaps, distill standalone facts, and graduate them into a zero-token vocabulary referenced via the session codec. |
-| 46 | [Typed World-Model Graph with Goal Topology](./46-typed-world-model-graph/) | A typed per-user entity graph with parent/child goal topology that reconstructs life-goal hierarchies at read time and injects a compact world-model block. |
-| 47 | [Ambient World-Snapshot Prefetch Bus](./47-ambient-snapshot-bus/) | A query planner splits broad categories into micro-queries and keeps small digests warm with confidence decay, so the agent rarely needs a live tool call. |
-| 54 | [LLM-Resident Context Codec](./54-llm-resident-context-codec/) | Token-space shorthand that swaps common phrases for short codes and weight-resident phrases for deterministic refs, with a legend and a pre-promotion secret scrubber. |
+| 06 | [Compound Memory Salience Scoring](./06-compound-memory-salience/) | A long-running conversational agent accumulates thousands of memories: stated facts, behavioral corrections, emotional moments, project notes. |
+| 07 | [Reflective Memory with Use-Reinforced Sorting](./07-reflective-memory/) | The salience-scored memory layer (guide 06) is good at *recall* — surfacing relevant facts for the current turn. |
+| 09 | [Intent-Based Tool Schema Selection](./09-intent-based-tool-selection/) | A capable agent exposes a large tool surface — 80+ functions for memory, web, wallet, scheduling, code, messaging, media, apps, and platform control. |
+| 10 | [Intent-Gated Personal Knowledge Shards](./10-personal-knowledge-shards/) | The memory systems in guides 06–07 are general-purpose: a salience-ranked pool of recalled facts and a set of behavioral reflections. |
+| 33 | [Knowledge Absorber → Zero-Token Vocabulary](./33-knowledge-absorber-sq-vocab/) | An agent built on a small local model has a fixed knowledge base — its weights. |
+| 46 | [Typed World-Model Graph with Goal Topology](./46-typed-world-model-graph/) | Most agent "memory" systems are flat: a vector store of text chunks retrieved by similarity. |
+| 47 | [Ambient World-Snapshot Prefetch Bus](./47-ambient-snapshot-bus/) | An assistant is constantly asked ambient questions — "what's the weather?", "anything happening in the markets?", "any big news?" — whose answers change slowly relative to how often they're asked. |
+| 54 | [LLM-Resident Context Codec (Token-Space Shorthand)](./54-llm-resident-context-codec/) | Large language model prompts are billed and rate-limited by token count, not by character count or semantic content. |
 
 ### Agent cognition: routing and growth
 
 | # | Guide | Summary |
 |---|-------|---------|
-| 12 | [Resilient Multi-Provider LLM Routing](./12-resilient-llm-routing/) | Named-mode fast-fail vs. auto-waterfall cascade across providers, per-backend health probes, and small-model context re-encoding. |
-| 24 | [Cloud / Local Privacy Router](./24-cloud-local-privacy-router/) | Classify each turn's sensitivity and redact secrets before any cloud call, so the cloud sees intent, not secrets. |
-| 30 | [Agent LoRA / Prefix-Weight Compiler](./30-lora-prefix-weight-compiler/) | Compile agent personality into an encrypted, content-addressed spec and bake stable facts into prefix-cacheable model messages. |
-| 31 | [Relational Intelligence Model](./31-relational-intelligence-model/) | Longitudinal signal tracking that infers stress and trust and calibrates response density and tone. |
-| 52 | [Competence-Gated On-Device Distillation Router](./52-competence-distillation-router/) | Routes a turn to a local model once an intent has accumulated enough demonstrated-competence training pairs, escalating complex turns to the cloud. |
-| 53 | [Manifest-Driven LoRA Expert Router](./53-lora-manifest-router/) | A manifest of expert adapters selected by intent kind and trigger-term regex to activate task-specific local weights. |
-| 55 | [Dependency-Aware Parallel Tool Dispatch](./55-tool-dependency-dag/) | Builds a topological DAG of tool calls, running independent nodes concurrently and chaining dependents on their inputs. |
-| 56 | [Speculative Tool Prefetch](./56-speculative-tool-prefetch/) | A small predictor watches a stream's first tokens to pre-execute likely tools in the background, turning tool waits into cache hits. |
-| 58 | [Batched Intent Collapse with Merkle Fan-Out](./58-batched-intent-collapse/) | Deduplicates shared context across many pending intents into one dense call anchored by a Merkle root, then fans results back out per virtual channel. |
+| 12 | [Resilient Multi-Provider LLM Routing](./12-resilient-llm-routing/) | A production conversational agent depends on a frontier LLM that it does not control. |
+| 24 | [Cloud / Local Privacy Router](./24-cloud-local-privacy-router/) | A hybrid agent has two places to run a turn: a small local model on the user's device (private, but limited) and a powerful cloud model (capable, but it sees everything you send it). |
+| 30 | [Agent LoRA / Prefix-Weight Compiler](./30-lora-prefix-weight-compiler/) | A locally-run agent has a fixed identity: a system prompt, a consistent voice, and a set of stable facts about its owner ("timezone is America/New_York", "prefers oat flat whites"). |
+| 31 | [Relational Intelligence Model](./31-relational-intelligence-model/) | A long-lived personal agent talks to the *same* person across hundreds of sessions. |
+| 52 | [Competence-Gated On-Device Distillation Router](./52-competence-distillation-router/) | A hybrid agent runs against two very different models: a large, expensive cloud model and a small, cheap, private on-device model. |
+| 53 | [Manifest-Driven LoRA Expert Router](./53-lora-manifest-router/) | A local inference stack can host many small fine-tuned adapters — LoRA "experts" — each teaching one narrow, stable capability: formatting tool calls, reviewing a transaction for risk, synthesizing a world model from raw conversation, operating memory. |
+| 55 | [Dependency-Aware Parallel Tool Dispatch](./55-tool-dependency-dag/) | When a language model decides to call several tools in a single turn, the simplest dispatcher runs them one after another. |
+| 56 | [Speculative Tool Prefetch from Stream Heads](./56-speculative-tool-prefetch/) | An agent runtime that lets a language model call tools usually runs in phases: the model streams its response, then — once generation is far enough along — a dispatch phase parses out the tool calls and executes them. |
+| 58 | [Batched Intent Collapse with Merkle Fan-Out](./58-batched-intent-collapse/) | A busy agent runtime resolves many independent requests against a large language model. |
 
 ### Agent governance
 
 | # | Guide | Summary |
 |---|-------|---------|
-| 08 | [DB-Backed Autonomous Agent Scheduler](./08-autonomous-agent-scheduler/) | A polling scheduler that fires agent work on a clock with atomic claims, failure isolation, and timezone-aware anchors. |
-| 37 | [Tiered Authority Bands](./37-agent-authority-bands/) | Permission bands (0–4) gating which tools an agent may invoke at a given authority level. |
-| 38 | [Will/Objective Topology + Constitutional Guardrails](./38-will-constitution-engine/) | A goal-topology engine paired with an invariant guardrail layer that filters proposed actions against hard rules. |
-| 39 | [Tool-Use Critic](./39-tool-critic/) | An independent validator that judges whether a tool call is appropriate and whether it achieved its intent, feeding correction memories. |
-| 40 | [Conversation State Kernel](./40-conversation-state-kernel/) | A per-turn finite state machine governing surface locks, dispatch, fork gating, and an empty-response guard. |
-| 48 | [Action Idempotency Reconciler](./48-action-idempotency-reconciler/) | Canonical recursive-sorted-args fingerprints prevent duplicate confirm cards and transition stale "executing" actions to "unknown" after a grace window. |
-| 49 | [Batched Single-Signature Approval Queue](./49-batched-approval-ceremony/) | Collects a turn's write actions, orders them low→high risk, authorizes the whole batch with one approval ceremony, and carries rollback hints for partial failure. |
-| 50 | [Headless Read-Only Reasoning Shards](./50-headless-reasoning-shards/) | Disposable read-only reasoning shards return strict JSON with confidence and conflict flags; a merge gate detects disagreement without widening the write surface. |
+| 08 | [DB-Backed Autonomous Agent Scheduler](./08-autonomous-agent-scheduler/) | An assistant that can only act while the user has a tab open is not autonomous. |
+| 37 | [Tiered Authority Bands for Agent Tool Execution](./37-agent-authority-bands/) | An autonomous agent that can call tools has a spectrum of capabilities: some are pure reads (check a balance, look up a price), some prepare an action without committing it, some perform bounded reversible writes, and some are irreversible and high-stakes (send funds, revoke a key, delete a vault). |
+| 38 | [Will / Objective Topology + Constitutional Guardrail Layer](./38-will-constitution-engine/) | A capable agent that only optimizes the *local* prompt drifts. |
+| 39 | [Tool-Use Critic — Independent Pre-Execution Validator](./39-tool-critic/) | An LLM that emits tool calls is, from a security standpoint, an untrusted code generator. |
+| 40 | [Conversation State Kernel — Per-Turn Governance FSM](./40-conversation-state-kernel/) | A streaming conversational agent that can call tools, spawn background workers, and react to rapid-fire input has a control-flow problem that a simple request/response handler does not. |
+| 48 | [Agent Action Idempotency Reconciler](./48-action-idempotency-reconciler/) | An autonomous agent that proposes write actions — send funds, post a message, schedule a job — does not behave like a deterministic function. |
+| 49 | [Batched Single-Signature Approval Queue](./49-batched-approval-ceremony/) | An autonomous agent often decides, within a single reasoning turn, to take several write actions at once: tag a contact, draft a message, rename a label, and move some funds. |
+| 50 | [Headless Read-Only Reasoning Shards](./50-headless-reasoning-shards/) | When an agent faces a hard decision, running a single model pass is fragile: the model can be confidently wrong, and there is no second opinion. |
 
 ### Platform, transport, and security
 
 | # | Guide | Summary |
 |---|-------|---------|
-| 03 | [Adaptive Session Symbol Table](./03-adaptive-session-compression/) | A streaming symbol table that compresses repeated session content. |
-| 04 | [Session Static Manifest](./04-session-static-manifest/) | Static-first prompt ordering and a pre-seeded manifest to maximize provider prefix-cache hits. |
-| 05 | [Encrypted Content-Addressed Identity Blobs](./05-encrypted-identity-ipfs/) | Store identity/knowledge as msgpack → AES-256-GCM → IPFS, with multi-gateway read fallback and no server-side plaintext. |
-| 11 | [QoS-Lane Stream Multiplexer](./11-yamux-qos-multiplexer/) | Yamux-style multiplexing over WebSocket with QoS lanes, dictionary compression, optional onion layering, and token-bucket flow control. |
-| 14 | [Scoped Device Sessions](./14-scoped-device-sessions/) | QR-paired device sessions that default to read-only at the protocol level, with out-of-band per-intent elevation permits. |
-| 22 | [Autonomous Threat Response](./22-autonomous-threat-response/) | Citation-enforced autonomous defensive actions bound to a verifiable event log, with hard caps, burst auto-pause, audit rows, and one-tap revert. |
-| 23 | [Multi-Tenant MCP Host](./23-mcp-multitenant-host/) | Host third-party tool servers with per-tenant namespacing, SSRF-hardened outbound, and per-turn approval-policy synthesis. |
-| 25 | [Merkle Audit Anchoring](./25-merkle-audit-anchoring/) | Hash append-only audit events into a Merkle tree, anchor the root periodically, and emit inclusion proofs. |
-| 26 | [Work Dispatcher with Scoped Invocation Tokens](./26-work-dispatcher-invocation-tokens/) | Async job orchestration where a short-lived invocation token grants user context without exposing the raw session token. |
-| 27 | [Universal Controller Overlay](./27-universal-controller-overlay/) | Pair a phone as an input surface for a primary session via relay tickets and a deterministic channel id, with viewport sync. |
-| 28 | [Agent-to-Agent Marketplace](./28-a2a-marketplace/) | A marketplace and job feed for autonomous agents under strict tenant isolation, where a job UUID alone is never authorization. |
-| 35 | [Injected App Bridge](./35-injected-app-bridge/) | Serve single-file HTML mini-apps with a dynamically injected `window`-level RPC bridge for scoped identity and storage. |
-| 36 | [Wallet-to-Wallet E2E Messaging](./36-dmail-e2e-messaging/) | End-to-end encrypted messaging where the server stores only opaque envelopes yet still indexes metadata for retrieval. |
-| 42 | [DNS-Pinned SSRF Guard](./42-dns-pinned-ssrf-guard/) | Resolves a host, validates every A/AAAA record against private/metadata ranges, then connects to the pinned IP with the original SNI/Host — closing the DNS-rebinding window. |
-| 44 | [Incident Response Playbook Engine](./44-incident-playbook-engine/) | Regex detection terms map to ordered response steps tagged auto-executable vs approval-required — a machine-readable runbook an agent can execute. |
-| 45 | [Stateless HMAC Preview-Gate Tokens](./45-hmac-preview-gate/) | An HMAC over the gate password issued to the client; rotating the password invalidates every token with no session store, verified in constant time. |
-| 57 | [Boundary-Aligned Streaming Pulse Encoder](./57-boundary-aligned-streaming/) | Accumulates stream tokens and flushes pulse frames on sentence/clause boundaries or a time cap, so chunks arrive as complete linguistic or code units. |
-| 59 | [Onion-Layered Multi-Hop Transport](./59-onion-layered-transport/) | Layered encryption where each hop peels exactly one layer to learn only the next hop, hiding payload and final destination from intermediaries. |
-| 60 | [On-Demand Encrypted Knowledge Blobs](./60-on-demand-knowledge-blobs/) | Knowledge fragments stored as compressed, encrypted, content-addressed blobs, fetched and injected on intent match then evicted to avoid prompt bloat. |
-| 61 | [Procedural Scene Macros](./61-procedural-scene-macros/) | Short macro tokens expand server-side into hundreds of concrete scene ops via a seeded PRNG, cutting generative-3D output tokens by up to ~25×. |
-| 62 | [Proof-of-Bandwidth Relay Accounting](./62-proof-of-bandwidth-relay/) | Credits relayed bytes only for valid payloads actually forwarded to a peer over a sliding window, with single-use tickets upgrading sessions without bearer tokens in URLs. |
-| 63 | [Hierarchical Spatial Scene Synthesis](./63-hierarchical-scene-synthesis/) | A SceneSpec → ZoneGraph → ChunkPlan → ops pipeline multiplexed into a ring-buffered, sequence-numbered replayable stream for reliable client sync. |
-| 64 | [Ephemeral Presence Registry with Privacy Blackout](./64-ephemeral-presence-registry/) | An in-memory ring buffer of ambient signals reduced to a never-persisted presence summary, with a two-layer privacy blackout that overrides other instructions. |
-| 65 | [In-Stream Sub-Channel Multiplexer](./65-stream-submultiplexer/) | Several logical sub-channels inside one stream with per-channel token buckets so small control frames are never starved by large data frames. |
+| 03 | [Adaptive Session Symbol Table (SQ-B Compression)](./03-adaptive-session-compression/) | Every call to a frontier LLM API charges for input tokens. |
+| 04 | [Session Static Manifest (SSM)](./04-session-static-manifest/) | Every LLM session has two distinct components in its context window: 1. |
+| 05 | [Encrypted Content-Addressed Identity Blobs (IPFS)](./05-encrypted-identity-ipfs/) | An agent platform needs to persist large, sensitive text artifacts: an agent's identity/personality definition, a user's imported chat history, a knowledge corpus, a wallet keystore. |
+| 11 | [QoS-Lane Stream Multiplexer (Yamux)](./11-yamux-qos-multiplexer/) | A single long-lived connection (a WebSocket, a TCP socket) often has to carry many independent logical conversations at once: an authentication handshake, a bulk blob transfer, a stream of small chat messages, and a periodic keepalive ping. |
+| 14 | [Scoped Device Sessions](./14-scoped-device-sessions/) | A user signed in on their phone wants to use the same account on a laptop without typing credentials or moving a hardware key. |
+| 22 | [Autonomous Threat Response with a Safety Contract](./22-autonomous-threat-response/) | Once an AI agent can *observe* security telemetry, the next obvious step is to let it *act* on it — block a hostile IP, trip a circuit breaker on an abused route, freeze a misbehaving app, revoke a stolen session, rate-limit a wallet. |
+| 23 | [Multi-Tenant MCP Host with SSRF Defense](./23-mcp-multitenant-host/) | The Model Context Protocol (MCP) lets a third party expose a catalog of tools that an agent can discover and call. |
+| 25 | [Merkle Audit Anchoring](./25-merkle-audit-anchoring/) | A system that takes consequential actions — moving funds, changing permissions, blocking traffic — needs an audit log that is *tamper-evident*. |
+| 26 | [Work Dispatcher with Scoped Invocation Tokens](./26-work-dispatcher-invocation-tokens/) | A platform lets third-party apps invoke capabilities on behalf of a user — "summarize my calendar", "rebalance my portfolio", "render this scene". |
+| 27 | [Universal Controller Overlay + Viewport Sync](./27-universal-controller-overlay/) | A user is running a heavy GPU/3D session on a TV or laptop, but the device with the best input surface is in their hand — their phone. |
+| 28 | [Agent-to-Agent Marketplace and Job Feed](./28-a2a-marketplace/) | As autonomous agents proliferate, they need a way to *hire each other*. |
+| 35 | [Injected App Bridge for Single-File Mini-Apps](./35-injected-app-bridge/) | We want users to author tiny "mini-apps" — a single HTML file with inline CSS and JavaScript — and run them inside a host application (an OS-like shell, a launcher, an agent surface). |
+| 36 | [Wallet-to-Wallet End-to-End Encrypted Messaging](./36-dmail-e2e-messaging/) | We want a private messaging system addressed by wallet, not by email or phone. |
+| 42 | [DNS-Pinned SSRF Guard for Outbound Webhooks](./42-dns-pinned-ssrf-guard/) | A service that lets users register an outbound webhook URL — "POST here when something happens" — is handing an attacker a server-side request primitive. |
+| 44 | [Deterministic Incident Response Playbook Engine](./44-incident-playbook-engine/) | When a security incident is suspected — a drained account, a phishing message, a leaked key — the response should be fast, ordered, and consistent. |
+| 45 | [Stateless HMAC Preview-Gate Tokens](./45-hmac-preview-gate/) | A site under development is often put behind a single shared password — a "preview gate" — so that only people who know the phrase can see it. |
+| 57 | [Boundary-Aligned Streaming Pulse Encoder](./57-boundary-aligned-streaming/) | Language models emit tokens one at a time, and the naive thing to do is forward each token to the client the instant it arrives. |
+| 59 | [Onion-Layered Multi-Hop Transport](./59-onion-layered-transport/) | When two parties communicate through a network of relays, each relay is a potential observer. |
+| 60 | [On-Demand Encrypted Knowledge-Blob Injection](./60-on-demand-knowledge-blobs/) | A capable assistant needs to "know" how to operate many apps, tools, and domains. |
+| 61 | [Procedural Scene Macros for Token-Efficient 3D](./61-procedural-scene-macros/) | When a language model authors a 3D scene by emitting concrete commands — one per box, sphere, or light — the output token count explodes. |
+| 62 | [Proof-of-Bandwidth Relay Accounting](./62-proof-of-bandwidth-relay/) | A relay node earns its keep by forwarding traffic between peers that cannot reach each other directly. |
+| 63 | [Hierarchical Spatial Scene Synthesis](./63-hierarchical-scene-synthesis/) | Generating a 3D scene directly as a flat list of engine commands is hard to control. |
+| 64 | [Ephemeral Presence Registry with Privacy Blackout](./64-ephemeral-presence-registry/) | An assistant that runs across several of a person's devices benefits from knowing whether that person is *present* right now: are they actively interacting, did a phone just detect motion, is a microphone listening, or has everything gone quiet for ten minutes? |
+| 65 | [In-Stream Sub-Channel Multiplexer with Flow Control](./65-stream-submultiplexer/) | A connection-level multiplexer already lets one socket carry many independent streams, each on its own QoS lane (see guide 11). |
 
 ## License
 

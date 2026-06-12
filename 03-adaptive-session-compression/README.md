@@ -8,18 +8,21 @@ Standard approaches to this problem — truncation, summarization, retrieval-aug
 
 The observation that makes this possible: **within a single session, the same phrases recur constantly.** A user working on a specific project will say "the authentication flow" or "the React component" or "what we discussed earlier" repeatedly. A system prompt contains fixed phrases like "you are a helpful assistant" or "always respond in JSON format" on every call. These repeated multi-word phrases are being tokenized and transmitted in full on every turn, even though the receiver already has the full text.
 
-The SQ-B (SubQuantum-B) adaptive symbol table solves this by learning session-specific repeated phrases and assigning them compact single-token shorthand identifiers. The model receives a small codec dictionary at the start of each turn, enabling it to use `§3K9F` instead of "the authentication flow" wherever the phrase appears in its response.
+The SQ-B (SubQuantum-B) adaptive symbol table solves this by learning session-specific repeated phrases and assigning them compact shorthand identifiers. The model receives a small codec dictionary at the start of each turn, enabling it to use `~3K9F` instead of "the authentication flow" wherever the phrase appears in its response.
 
 ## Design decisions
 
-**Why 3–8 word n-grams?**  
-Shorter n-grams (1–2 words) have too little entropy to be useful — common stopword bigrams like "the user" or "in the" save almost nothing. Longer n-grams (9+ words) are too specific to appear more than once or twice per session. The 3–8 word range captures the sweet spot of commonly-repeated semantic phrases. The 12-character minimum length filters out multi-word phrases that are too short to compress meaningfully.
+**Why 5–8 word n-grams?**  
+The shorthand token is not free: it costs tokens of its own (see "Why a single-token prefix" below) plus a per-entry line in the codec dictionary header. A short 3–4 word phrase often tokenizes to roughly the same number of tokens as its shorthand plus that overhead — net-negative compression. Longer phrases carry enough tokens that replacing them clears the overhead with room to spare. Shorter n-grams (1–2 words) also have too little entropy (stopword bigrams like "the user" save nothing); n-grams of 9+ words are too specific to recur. The 5–8 word range, with a 20-character minimum, is where compression is reliably net-positive.
 
 **Why the entropy gate (minimum 8 bytes saved)?**  
 The codec dictionary itself consumes tokens. Adding an entry that saves 2 bytes per use is not worth the overhead of including it in the dictionary header. The 8-byte threshold ensures every entry in the table pulls its weight.
 
 **Why FNV-1a for token generation?**  
-FNV-1a is a 32-bit non-cryptographic hash: fast, deterministic, no dependencies, zero allocation beyond the integer arithmetic. Token collisions (two different phrases mapping to the same §-identifier) are handled by the deduplication logic in the symbol table — the phrase is the map key, not the token. The token is just a display form.
+FNV-1a is a 32-bit non-cryptographic hash: fast, deterministic, no dependencies, zero allocation beyond the integer arithmetic. Token collisions (two different phrases mapping to the same ~-identifier) are handled by the deduplication logic in the symbol table — the phrase is the map key, not the token. The token is just a display form.
+
+**Why a single-token ASCII prefix (`~`)?**  
+The point of the shorthand is to cost fewer tokens than the phrase it replaces, so the prefix character must itself be cheap. The section sign `§` (U+00A7) is multi-byte UTF-8 and tokenizes to ~2 tokens on common byte-pair tokenizers (cl100k_base, o200k_base); a `§XXXX` shorthand can therefore cost 3–4 tokens — frequently more than the short phrase it was meant to compress. A single-byte ASCII prefix such as `~` (or `_`) is digested as a single token, keeping the shorthand genuinely compact. This is the same economics that drives the 5+ word n-gram floor.
 
 **Why this scoring formula?**  
 
@@ -29,9 +32,9 @@ score = frequency × 0.6 + recency_weight × 0.3 + bytes_saved_per_use × 0.1
 
 - `frequency × 0.6`: phrases used often are most valuable (exploitation)
 - `recency_weight × 0.3`: a phrase used 20 turns ago is less likely to recur than one used 2 turns ago (decay-weighted freshness)
-- `bytes_saved × 0.1`: a tie-breaker that slightly favors longer phrases
+- `bytes_saved_per_use × 0.1`: a static tie-breaker that slightly favors longer phrases
 
-The weights were tuned empirically against typical conversational AI sessions. Frequency dominates because session-local vocabulary stabilizes after a few turns and the highest-frequency phrases are almost always the right ones to keep.
+The tie-breaker must be **bytes saved per use** — a constant for a given phrase (phrase length minus token length). The implementation accumulates `bytesSaved` on every hit, so `bytesSaved / frequency` correctly recovers that stable per-use figure. The trap to avoid: storing a single-use constant and *then* dividing it by frequency, which would make the term shrink as a phrase recurs — actively penalizing the most-repeated phrases, the exact opposite of the intent. The weights were tuned empirically; frequency dominates because session-local vocabulary stabilizes after a few turns and the highest-frequency phrases are almost always the right ones to keep.
 
 **Why 128 entries maximum?**  
 The codec dictionary is injected into every call. At ~5 tokens per entry (token + phrase + separator), 128 entries costs ~640 tokens — acceptable overhead for a dictionary that typically saves 8–18% of total input tokens. Above 128 entries, the dictionary overhead starts to outweigh the savings for average sessions.
@@ -44,19 +47,23 @@ Pure LRU would evict the oldest-used entry, which might be a high-frequency phra
 ```
 ingest(text):
   words = split(text)
-  for n in 3..8:
+  for n in 5..8:
     for each n-gram in words:
-      if len(n-gram) < 12 chars: skip
-      bytes_saved = len(phrase) - len(§TOKEN)
+      if len(n-gram) < 20 chars: skip
+      bytes_saved = len(phrase) - len(~TOKEN)   // per-use, constant for this phrase
       if bytes_saved < 8: skip  // entropy gate
-      if phrase in table: update frequency + recency
-      else if table.size >= 128: evict(lowest_score)
-      table[phrase] = { token, frequency=1, lastUsedMs=now, bytesSaved }
+      if phrase in table:
+        entry.frequency  += 1
+        entry.lastUsedMs  = now
+        entry.bytesSaved += bytes_saved          // accumulate cumulative total
+      else:
+        if table.size >= 128: evict(lowest_score)
+        table[phrase] = { token, frequency=1, lastUsedMs=now, bytesSaved=bytes_saved }
 
 score(entry):
   age_ms        = now - entry.lastUsedMs
   recency       = 1 / (1 + age_ms / 60_000)
-  bytes_per_use = entry.bytesSaved / entry.frequency
+  bytes_per_use = entry.bytesSaved / entry.frequency   // cumulative ÷ uses = stable per-use value
   return entry.frequency * 0.6 + recency * 0.3 + bytes_per_use * 0.1
 
 evict():
@@ -67,7 +74,7 @@ buildCodecDict(table):
   return "CODEC SHORTHAND\n" + sorted.map(e => `${e.token}=${e.phrase}`).join("\n")
 ```
 
-The token format `§XXXXXX` uses the section-sign prefix (U+00A7) to avoid collisions with natural language, followed by up to 6 alphanumeric characters from the FNV-1a hash of the phrase expressed in base-36.
+The token format `~XXXXXX` uses a single-byte tilde prefix followed by up to 6 alphanumeric characters from the FNV-1a hash of the phrase expressed in base-36. The prefix is ASCII on purpose: a multi-byte prefix like `§` (U+00A7) tokenizes to ~2 tokens on byte-pair tokenizers, which can make a short shorthand cost more tokens than the phrase it replaces. See "Why a single-token ASCII prefix" above.
 
 ## Layering with provider-level caching
 
@@ -102,7 +109,8 @@ const codecBlock = table.buildCodecInjection();
 
 ## Limitations and extensions
 
-- **Model cooperation required.** The model must be instructed to use §-tokens when it recognizes exact phrase matches. This is a soft instruction — models don't always comply perfectly, especially shorter models. The compression gain comes from the model's outputs, not the inputs (the server decodes §-tokens before displaying to the user).
+- **Model cooperation required.** The model must be instructed to use ~-tokens when it recognizes exact phrase matches. This is a soft instruction. Large models follow it well, but smaller/faster edge models frequently hallucinate the non-semantic hashes or slip back into natural language — which breaks the server-side decode path. Treat a missing or garbled token as "leave the text as-is" rather than a hard error. The compression gain comes from the model's outputs, not the inputs (the server decodes ~-tokens before displaying to the user).
+- **Bytes are a proxy for tokens.** The entropy gate and scoring measure bytes, but billing is in tokens, and the two do not map 1:1. The 5+ word floor and single-token prefix exist to keep the byte heuristic conservative enough that positive byte savings reliably imply positive token savings. For maximum accuracy, gate on an actual tokenizer count (e.g. `tiktoken`) instead of byte length.
 - **Session-local only.** The symbol table is per-session and ephemeral. Phrases do not carry over between sessions unless you implement a persistent cross-session vocabulary (a "global ledger" of frequently-occurring phrases across all sessions, which can be pre-seeded into new sessions — see guide 04).
-- **Not for security-sensitive fields.** Do not pass §-tokens through authentication or transaction flows. The decoding step must happen before any security decision is made.
+- **Not for security-sensitive fields.** Do not pass ~-tokens through authentication or transaction flows. The decoding step must happen before any security decision is made.
 - **Token counting.** The codec dictionary injection costs ~5–8 tokens per entry. For sessions shorter than ~10 turns, the overhead may outweigh savings. Enable the entropy gate strictly for short sessions.

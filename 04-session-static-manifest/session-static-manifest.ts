@@ -78,8 +78,9 @@ export interface IngestableTable {
  * across all sections of the static content.
  */
 export function preSeedSymbolTable(
-  convId:    string | number,
-  symTable:  IngestableTable,
+  convId:     string | number,
+  symTable:   IngestableTable,
+  anchorWeight = 3,
 ): void {
   const entry = _ssm.get(convId);
   if (entry?.seeded) return; // already done
@@ -87,8 +88,18 @@ export function preSeedSymbolTable(
   const seed = _globalSeedText;
   if (seed) {
     const CHUNK_SIZE = 3_000;
-    for (let i = 0; i < seed.length; i += CHUNK_SIZE) {
-      symTable.ingest(seed.slice(i, i + CHUNK_SIZE));
+    // Ingest each chunk `anchorWeight` times so pre-seeded phrases enter the table
+    // at frequency ≈ anchorWeight instead of 1 — an "artificial gravity well".
+    // Boot-time entries carry a boot-era lastUsedMs, so SQ-B's recency term decays
+    // to ~0 within minutes; at frequency 1 a fast-talking user's freshly-seen
+    // phrases (frequency 1, recency ~1) would evict critical structural terms
+    // (tool schemas, JSON rules) before the model ever uses them. Frequency is the
+    // dominant scoring term (×0.6), so a baseline of 3 keeps the static vocabulary
+    // anchored until it is either referenced natively or genuinely stale.
+    for (let rep = 0; rep < Math.max(1, anchorWeight); rep++) {
+      for (let i = 0; i < seed.length; i += CHUNK_SIZE) {
+        symTable.ingest(seed.slice(i, i + CHUNK_SIZE));
+      }
     }
   }
 

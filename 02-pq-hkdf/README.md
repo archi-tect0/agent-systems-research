@@ -4,7 +4,7 @@
 
 HKDF-SHA256 is the standard key derivation function in most modern systems. Its security depends on the collision-resistance and preimage-resistance of SHA-256. SHA-256 is a Merkle-Damgård construction — a structural family that is known to be vulnerable to length-extension attacks (mitigated by HMAC but still part of the attack surface analysts consider).
 
-Against a cryptographically-relevant quantum computer, Grover's algorithm provides a quadratic speedup in searching for preimages. This effectively halves the bit-security of any hash function: SHA-256 delivers 128-bit classical security but only 128-bit post-quantum security because the output is 256 bits and Grover halves it. (You might expect the halving would produce 128-bit PQ security — it does — but the point is that SHA-256's 256-bit output is designed for 128-bit PQ security, not 256-bit.)
+Against a cryptographically-relevant quantum computer, Grover's algorithm provides a quadratic speedup for preimage search. The precise picture matters here: classically, SHA-256 offers **256-bit preimage resistance** and **128-bit collision resistance** (the latter bounded by the birthday paradox). Grover's algorithm attacks *preimage* resistance specifically, reducing it from 256 bits to **128 bits**. A 256-bit hash therefore lands at a uniform 128-bit post-quantum floor — which is exactly the long-term target baseline, matching the 128-bit symmetric security of AES-128.
 
 The larger concern is **structural independence**. SHA-256 (Merkle-Damgård with Davies-Meyer compression) and SHA3-256 (Keccak sponge construction) have no design-level relationship. A cryptanalytic break in SHA-256 that exploits the Merkle-Damgård structure does not transfer to SHA3-256. For long-lived key derivations — vault keys, identity roots, wallet derivation paths — using a structurally-independent hash as the fallback-ready alternative costs almost nothing and adds a meaningful layer of algorithm agility.
 
@@ -22,6 +22,9 @@ SHA3-512 would provide 256-bit post-quantum security but with larger output bloc
 **Why RFC 5869 structure?**  
 HKDF is a two-step construction (extract → expand) with well-understood security proofs. The extract step converts arbitrary-length input key material into a uniform pseudorandom key using HMAC. The expand step derives arbitrary amounts of output keying material from that PRK. Reimplementing this structure with SHA3-256 instead of SHA-256 inherits the HKDF security proofs while upgrading the hash.
 
+**Why keep HMAC at all, given SHA-3 is a sponge?**  
+SHA3-256 is a Keccak sponge construction and is naturally immune to length-extension attacks. Unlike SHA-256, it does not *need* the nested inner/outer structure of HMAC to be a secure keyed primitive — NIST's dedicated keyed construction for Keccak is KMAC (SP 800-185), which drops HMAC's padding entirely and is faster. This implementation keeps HMAC anyway, as a deliberate trade-off: it lets the construction follow RFC 5869 verbatim, inheriting that protocol's widely-trusted, easily-audited security proofs, with the only change being the hash identifier. The cost is a negligible amount of hashing overhead; the benefit is that there is no novel construction to re-prove. A KMAC-based variant is a reasonable future optimization if performance ever matters.
+
 **Why not just use `hkdfSync("sha3-256", ...)`?**  
 Node.js `hkdfSync` supports SHA-3 in recent versions, but availability varies by OpenSSL version and runtime. A manual HKDF-SHA3-256 implementation using `createHmac("sha3-256")` is 25 lines, has no external dependencies, and works on any Node.js ≥ 18 regardless of OpenSSL flags. The manual implementation is also easier to audit — it is a direct translation of RFC 5869.
 
@@ -36,13 +39,15 @@ HKDF-SHA3-256(IKM, Salt, Info, Length):
 
   Expand:
     N   = ceil(Length / 32)    // SHA3-256 produces 32-byte blocks
-    T_0 = ""
+    T_0 = zero-length byte buffer   // an empty BUFFER, not the string ""
     for i in 1..N:
       T_i = HMAC-SHA3-256(key=PRK, data=T_{i-1} || Info || byte(i))
     return (T_1 || T_2 || ... || T_N)[0..Length]
 ```
 
 This is RFC 5869 verbatim, with SHA-256 replaced by SHA3-256 in all HMAC calls.
+
+Note on `T_0`: it must be a **zero-length byte buffer** (`Buffer.alloc(0)`), not the empty string `""`. The first iteration computes `HMAC(PRK, T_0 || Info || byte(1))`; if `T_0` is a JS string, the concatenation can silently coerce types or alter the byte layout depending on the binary helpers in use, producing output that diverges from any reference vector. The reference implementation initializes it as `Buffer.alloc(0)`.
 
 ## Relationship to FH-KDF
 
