@@ -49,7 +49,43 @@ A handful of guides require external libraries and will only run once those are 
 
 Each guide's "Reference implementation" section lists exactly what it needs. Where a guide could pull in a heavy chain SDK (e.g. guide 34's per-chain transaction builders), the SDK is kept behind a pluggable adapter so the file still runs on built-ins alone — the demo simply skips the chains you have not wired an adapter for.
 
+## How the pieces fit together
+
+Each guide stands alone, but they were extracted from one real system, so they stack into layers rather than sitting in a flat pile. Read bottom-to-top, the catalog is roughly an agent acting on a user's behalf — from the substrate it runs on, up through the keys that identify it, to the governance that gates what it does:
+
+```
+                 intent ──▶ action
+  ┌────────────────────────────────────────────────┐
+  │  Governance   gate every write before it lands  │
+  ├────────────────────────────────────────────────┤
+  │  Cognition    decide what to do (memory,        │
+  │               world model, routing)             │
+  ├────────────────────────────────────────────────┤
+  │  Wallet       hold and move value under policy  │
+  ├────────────────────────────────────────────────┤
+  │  Identity     who the actor is                  │
+  ├────────────────────────────────────────────────┤
+  │  Platform     the substrate underneath          │
+  └────────────────────────────────────────────────┘
+       (governance at the top, transport at the base)
+```
+
+The threads that run between the layers matter more than the layers themselves:
+
+- **Identity anchors the wallet.** A passkey/SIWE login or a PQ identity (19–21) is the proof that a shadow-derived wallet (15) and its spend policy (17, 18) are bound to a specific actor — no separate seed phrase to manage.
+- **Cognition is split into context and dispatch.** Memory (06, 07, 10) and the typed world model (46, 47) supply *what the agent knows*; intent routing and parallel tool dispatch (09, 55, 56) turn *what it wants* into concrete tool calls.
+- **Governance wraps every write.** Authority bands (37), the will/constitution layer (38), an independent critic (39), the per-turn state machine (40), the batched approval queue (49), and idempotency (48) all sit between an intent and a side effect — with tamper-evident receipts and audit anchoring (25, 48, 51) recording what actually happened.
+- **`00-agent-kernel` is where five of these actually meet.** It composes memory, tool routing, governance, wallet limits, and a world model into one small runnable floor — the integrated example the layered guides each describe one primitive at a time. Start there for the shape of the whole, then drop into a numbered guide for depth.
+
+These are reference patterns, not a packaged stack: nothing here forces you to adopt the layer above or below it. The map is for orientation — take a single layer, or trace one thread end to end.
+
 ## Catalog
+
+### Integrated core
+
+| # | Guide | Summary |
+|---|-------|---------|
+| 00 | [Agent Kernel — the integrated core of the five primitives](./00-agent-kernel/) | A runnable, dependency-free kernel that composes memory, tool routing, governance, wallet limits, and a typed world model behind one policy-free contract — the integrated floor the numbered guides each go deeper on. |
 
 ### Identity, keys, and cryptography
 
