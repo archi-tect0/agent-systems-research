@@ -79,6 +79,22 @@ The threads that run between the layers matter more than the layers themselves:
 
 These are reference patterns, not a packaged stack: nothing here forces you to adopt the layer above or below it. The map is for orientation — take a single layer, or trace one thread end to end.
 
+### Start here
+
+New to this? Read these six in order — the integrated core, then one guide from each layer:
+
+[`00`](./00-agent-kernel/) core → [`20`](./20-siwe-passkey-floor/) identity → [`17`](./17-agent-spend-limit-wallet/) wallet → [`06`](./06-compound-memory-salience/) cognition → [`37`](./37-agent-authority-bands/) governance → [`25`](./25-merkle-audit-anchoring/) platform
+
+The kernel (`00`) ties the layers together. Its reference loop, `runIntent`, runs the same pipeline every turn:
+
+```
+intent
+  ↓
+route → govern → spend-check → dispatch → remember
+```
+
+Spend is *checked* before dispatch but the wallet is only *charged* after the tool succeeds. Building the prompt is a separate call — `context()` renders the world model plus the most relevant memory.
+
 ## Catalog
 
 ### Integrated core
