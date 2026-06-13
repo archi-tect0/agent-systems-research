@@ -6,7 +6,7 @@ This is shared in the spirit of *here is how I approached these problems, in cas
 
 ## What this is — and isn't
 
-- **It is** ~65 self-contained, runnable reference implementations with the reasoning attached. Most code you find online shows you *what*; these try to show you *why*.
+- **It is** ~72 self-contained, runnable reference implementations with the reasoning attached. Most code you find online shows you *what*; these try to show you *why*.
 - **It is not** an audited, production-ready library. Each implementation isolates a single idea so it can be read and run in a few minutes. Several deliberately reimplement an idea on Node.js built-ins just to stay runnable; each guide notes where a real system would reach for a vetted dependency instead.
 - **The cryptography here is educational.** Where a guide hand-rolls a primitive it says so, and points to what production should use (`@noble/*`, `ethers`, audited libraries). Read those as *the shape of the technique*, not *ship this as-is*.
 
@@ -56,6 +56,9 @@ Each guide stands alone, but they were extracted from one real system, so they s
 ```
                  intent ──▶ action
   ┌────────────────────────────────────────────────┐
+  │  Reflection   observe, repair, and grow the     │
+  │               agent itself, gated like a write  │
+  ├────────────────────────────────────────────────┤
   │  Governance   gate every write before it lands  │
   ├────────────────────────────────────────────────┤
   │  Cognition    decide what to do (memory,        │
@@ -67,7 +70,7 @@ Each guide stands alone, but they were extracted from one real system, so they s
   ├────────────────────────────────────────────────┤
   │  Platform     the substrate underneath          │
   └────────────────────────────────────────────────┘
-       (governance at the top, transport at the base)
+       (self-maintenance at the top, transport at the base)
 ```
 
 The threads that run between the layers matter more than the layers themselves:
@@ -76,6 +79,7 @@ The threads that run between the layers matter more than the layers themselves:
 - **Cognition is split into context and dispatch.** Memory (06, 07, 10) and the typed world model (46, 47) supply *what the agent knows*; intent routing and parallel tool dispatch (09, 55, 56) turn *what it wants* into concrete tool calls.
 - **Governance wraps every write.** Authority bands (37), the will/constitution layer (38), an independent critic (39), the per-turn state machine (40), the batched approval queue (49), and idempotency (48) all sit between an intent and a side effect — with tamper-evident receipts and audit anchoring (25, 48, 51) recording what actually happened.
 - **`00-agent-kernel` is where five of these actually meet.** It composes memory, tool routing, governance, wallet limits, and a world model into one small runnable floor — the integrated example the layered guides each describe one primitive at a time. Start there for the shape of the whole, then drop into a numbered guide for depth.
+- **Self-maintenance is the reflective layer (66–72).** Above the intent→action stack, the agent operates on *itself*: a self-model graph (67) and a metacognitive repair loop (66) diagnose and fix faults, capability acquisition (69) grows tools it lacks, calibrated uncertainty (68) and resource self-governance (70) decide *whether* and *how cheaply* to act, memory consolidation (71) prunes and promotes what it has learned, and counterfactual simulation (72) dry-runs irreversible plans before they touch anything real — all walled behind the same throwaway-branch + human-merge gate as governance.
 
 These are reference patterns, not a packaged stack: nothing here forces you to adopt the layer above or below it. The map is for orientation — take a single layer, or trace one thread end to end.
 
@@ -197,6 +201,20 @@ Spend is *checked* before dispatch but the wallet is only *charged* after the to
 | 63 | [Hierarchical Spatial Scene Synthesis](./63-hierarchical-scene-synthesis/) | Generating a 3D scene directly as a flat list of engine commands is hard to control. |
 | 64 | [Ephemeral Presence Registry with Privacy Blackout](./64-ephemeral-presence-registry/) | An assistant that runs across several of a person's devices benefits from knowing whether that person is *present* right now: are they actively interacting, did a phone just detect motion, is a microphone listening, or has everything gone quiet for ten minutes? |
 | 65 | [In-Stream Sub-Channel Multiplexer with Flow Control](./65-stream-submultiplexer/) | A connection-level multiplexer already lets one socket carry many independent streams, each on its own QoS lane (see guide 11). |
+
+### Agent self-maintenance (metacognition)
+
+The Layer-2 set — the agent operating on *itself*. Each runs on Node built-ins.
+
+| # | Guide | Summary |
+|---|-------|---------|
+| 66 | [Metacognitive Self-Repair Loop](./66-metacognitive-self-repair/) | The point where an agent stops being a chatbot and becomes an operator is the moment it can answer "what is wrong with me right now?" — and fix it without being able to quietly break itself. |
+| 67 | [Agent Self-Model Graph](./67-agent-self-model-graph/) | When a user says "your memory is broken", they are reporting a symptom, not a cause; the agent needs an explicit typed model of its own subsystems, capabilities, and live health to localize the fault and its blast radius. |
+| 68 | [Calibrated Uncertainty Engine](./68-calibrated-uncertainty-engine/) | An agent that sounds equally confident about "this song is lo-fi" and "send 2 ETH to this address" is dangerous in exactly the second case. |
+| 69 | [Self-Directed Capability Acquisition](./69-self-directed-capability-acquisition/) | A long-running agent repeatedly hits intents it cannot satisfy; letting it write its own tools is an account-compromise primitive wearing a helpful hat — the value is the wall around it. |
+| 70 | [Resource Self-Governance](./70-resource-self-governance/) | An agent that always reaches for its best tool behaves correctly right up until it runs out of budget mid-task — and then fails the whole job, often after the expensive part is already spent. |
+| 71 | [Memory Consolidation ("Sleep")](./71-memory-consolidation-sleep/) | While an agent is awake it accumulates raw episodic memories — duplicates and noise included — and without a consolidation pass that store grows without bound and buries its few durable lessons. |
+| 72 | [Counterfactual Simulation](./72-counterfactual-simulation/) | An agent about to run a multi-step plan with a real, irreversible side-effect has no safe way to ask "what happens if I run this?" without running it. |
 
 ## License
 
