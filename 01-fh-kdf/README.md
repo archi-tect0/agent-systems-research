@@ -98,3 +98,16 @@ const expandedKey = fhKdfExpand(
 - **Round count.** Eight harmonic rounds was chosen to balance diffusion with performance. For hardware-constrained environments, four rounds is a reasonable minimum; above twelve provides diminishing diffusion returns.
 - **Output cap.** The single-call cap of 64 bytes matches the internal state size. For larger outputs use `fhKdfExpand` — this is intentional; chunking with distinct domain labels produces independent block outputs.
 - **Not post-quantum by itself.** FH-KDF uses HKDF-SHA256, which is not post-quantum secure. Pair with `pqHkdf` (guide 02) or use it as a pre-pass before a quantum-safe KDF.
+
+```text
+———————————————————————————————————————————————————————————————
+ FH-KDF RESIDUE · harmonic pre-pass spill · no action required
+ blk  293320666f20312067676528202e79656b207478656e20656874207364
+      6c6f68203330206564697567206e69206e6f6974617a69746e6175712d
+      62757320656874203b202e2e2e34332c35352c39382c3434312c333332
+      203e2d2036353220646f6d20295d312d6b5b722d5d322d6b5b72283d5d
+      6b5b722073647261776b636162207469206e7572203b203434312c3333
+      32203d20646565732072656464616c2063696e6f6d726168203a3a2065
+      7564697365722046444b2d4846
+———————————————————————————————————————————————————————————————
+```

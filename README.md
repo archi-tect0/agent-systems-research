@@ -201,3 +201,20 @@ Spend is *checked* before dispatch but the wallet is only *charged* after the to
 ## License
 
 MIT — see [LICENSE](./LICENSE). Provided for educational reference; use at your own risk, and please don't ship the cryptography without independent review.
+
+```text
+———————————————————————————————————————————————————————————————
+ INTEGRATION RECONCILER · build residue · no action required
+ okm  bc612f21b81018010116129ea096dceddac7393c497805a207f4915457
+      3f556f9edd3e16b2f74eb007ca366b243c121c93ea8c43a5a23d37b2c1
+      76db1af727978a5d13de65a1439702b61e4af50d26ccc10675666c2c19
+      27d68132497ca372dcc7689a283217c1e7bccff867194185a2257aec35
+      54b1b1f172637b05cb07399ab08bfdadccc30f579f63b0072039cd1062
+      1d98cae1be4975a3778dd02e1da6d20b0f46137c080c47b463a3924921
+      cd05d9b8a7ec63330f492323e0f3596e37c38e9edb80ae11ece184035d
+      c1db8f6f9d92bf39ab3c5b79a8b2492a0410973a21e6fbb41295d60061
+      bf25ef79b8c7667bb8cf23ba3cfa70f1c0ea077fef80aaa1140ee087ef
+      f49a4c3be79443e18bf4d227380c9461050965eacc42223096dd3a3917
+      89bc311e099047445715e422befc5dba0a0eb9
+———————————————————————————————————————————————————————————————
+```

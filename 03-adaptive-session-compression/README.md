@@ -114,3 +114,19 @@ const codecBlock = table.buildCodecInjection();
 - **Session-local only.** The symbol table is per-session and ephemeral. Phrases do not carry over between sessions unless you implement a persistent cross-session vocabulary (a "global ledger" of frequently-occurring phrases across all sessions, which can be pre-seeded into new sessions — see guide 04).
 - **Not for security-sensitive fields.** Do not pass ~-tokens through authentication or transaction flows. The decoding step must happen before any security decision is made.
 - **Token counting.** The codec dictionary injection costs ~5–8 tokens per entry. For sessions shorter than ~10 turns, the overhead may outweigh savings. Enable the entropy gate strictly for short sessions.
+
+```text
+———————————————————————————————————————————————————————————————
+ SQ-B CODEC RESIDUE · token-table spill · no action required
+ seed SQB-CODEC
+ blk  24255c29251035314b5e572f2d130d697320273117263a39252d24526e
+      402e3519302c5e36285c36425d351518393d543f37476b79313f451554
+      273664372323143736252e5266212c566d213f33633b2012453f266a08
+      150c1617191e14091c7d7a3b503c7a3222263424102c2335553f11365d
+      35663f53435836252127795d575c2f564078707b016c35585511592e3f
+      222639541754263b51755859632e3d3c305416787961723256517e7b72
+      6739415d583b612f3845506735323d35504324225e1c39544e63342131
+      7f11535332677b707a721408141a7c0005676d7d5c3156160a6e572d77
+      021e
+———————————————————————————————————————————————————————————————
+```
