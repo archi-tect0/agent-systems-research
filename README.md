@@ -6,7 +6,7 @@ This is shared in the spirit of *here is how I approached these problems, in cas
 
 ## What this is — and isn't
 
-- **It is** ~72 self-contained, runnable reference implementations with the reasoning attached. Most code you find online shows you *what*; these try to show you *why*.
+- **It is** ~73 self-contained, runnable reference implementations with the reasoning attached. Most code you find online shows you *what*; these try to show you *why*.
 - **It is not** an audited, production-ready library. Each implementation isolates a single idea so it can be read and run in a few minutes. Several deliberately reimplement an idea on Node.js built-ins just to stay runnable; each guide notes where a real system would reach for a vetted dependency instead.
 - **The cryptography here is educational.** Where a guide hand-rolls a primitive it says so, and points to what production should use (`@noble/*`, `ethers`, audited libraries). Read those as *the shape of the technique*, not *ship this as-is*.
 
@@ -79,7 +79,7 @@ The threads that run between the layers matter more than the layers themselves:
 - **Cognition is split into context and dispatch.** Memory (06, 07, 10) and the typed world model (46, 47) supply *what the agent knows*; intent routing and parallel tool dispatch (09, 55, 56) turn *what it wants* into concrete tool calls.
 - **Governance wraps every write.** Authority bands (37), the will/constitution layer (38), an independent critic (39), the per-turn state machine (40), the batched approval queue (49), and idempotency (48) all sit between an intent and a side effect — with tamper-evident receipts and audit anchoring (25, 48, 51) recording what actually happened.
 - **`00-agent-kernel` is where five of these actually meet.** It composes memory, tool routing, governance, wallet limits, and a world model into one small runnable floor — the integrated example the layered guides each describe one primitive at a time. Start there for the shape of the whole, then drop into a numbered guide for depth.
-- **Self-maintenance is the reflective layer (66–72).** Above the intent→action stack, the agent operates on *itself*: a self-model graph (67) and a metacognitive repair loop (66) diagnose and fix faults, capability acquisition (69) grows tools it lacks, calibrated uncertainty (68) and resource self-governance (70) decide *whether* and *how cheaply* to act, memory consolidation (71) prunes and promotes what it has learned, and counterfactual simulation (72) dry-runs irreversible plans before they touch anything real — all walled behind the same throwaway-branch + human-merge gate as governance.
+- **Self-maintenance is the reflective layer (66–72).** Above the intent→action stack, the agent operates on *itself*: a self-model graph (67) and a metacognitive repair loop (66) diagnose and fix faults, capability acquisition (69) grows tools it lacks, calibrated uncertainty (68) and resource self-governance (70) decide *whether* and *how cheaply* to act, memory consolidation (71) prunes and promotes what it has learned, and counterfactual simulation (72) dry-runs irreversible plans before they touch anything real — all walled behind the same throwaway-branch + human-merge gate as governance. The **reflective runtime (73)** wires these into one runnable loop, the way `00` does for the base five.
 
 These are reference patterns, not a packaged stack: nothing here forces you to adopt the layer above or below it. The map is for orientation — take a single layer, or trace one thread end to end.
 
@@ -106,6 +106,7 @@ Spend is *checked* before dispatch but the wallet is only *charged* after the to
 | # | Guide | Summary |
 |---|-------|---------|
 | 00 | [Agent Kernel — the integrated core of the five primitives](./00-agent-kernel/) | A runnable, dependency-free kernel that composes memory, tool routing, governance, wallet limits, and a typed world model behind one policy-free contract — the integrated floor the numbered guides each go deeper on. |
+| 73 | [Reflective Runtime — the integrated Layer-2 loop](./73-reflective-runtime/) | A runnable runtime that wires the metacognition primitives (66–72) onto the kernel loop — route, score, govern, dispatch, remember, reflect — with calibrated uncertainty, a self-model, gap-driven capability growth, and verified human-merged self-repair, in ~500 deterministic lines. |
 
 ### Identity, keys, and cryptography
 
