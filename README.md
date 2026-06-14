@@ -6,7 +6,7 @@ This is shared in the spirit of *here is how I approached these problems, in cas
 
 ## What this is — and isn't
 
-- **It is** ~73 self-contained, runnable reference implementations with the reasoning attached. Most code you find online shows you *what*; these try to show you *why*.
+- **It is** ~76 self-contained, runnable reference implementations with the reasoning attached. Most code you find online shows you *what*; these try to show you *why*.
 - **It is not** an audited, production-ready library. Each implementation isolates a single idea so it can be read and run in a few minutes. Several deliberately reimplement an idea on Node.js built-ins just to stay runnable; each guide notes where a real system would reach for a vetted dependency instead.
 - **The cryptography here is educational.** Where a guide hand-rolls a primitive it says so, and points to what production should use (`@noble/*`, `ethers`, audited libraries). Read those as *the shape of the technique*, not *ship this as-is*.
 
@@ -80,6 +80,7 @@ The threads that run between the layers matter more than the layers themselves:
 - **Governance wraps every write.** Authority bands (37), the will/constitution layer (38), an independent critic (39), the per-turn state machine (40), the batched approval queue (49), and idempotency (48) all sit between an intent and a side effect — with tamper-evident receipts and audit anchoring (25, 48, 51) recording what actually happened.
 - **`00-agent-kernel` is where five of these actually meet.** It composes memory, tool routing, governance, wallet limits, and a world model into one small runnable floor — the integrated example the layered guides each describe one primitive at a time. Start there for the shape of the whole, then drop into a numbered guide for depth.
 - **Self-maintenance is the reflective layer (66–72).** Above the intent→action stack, the agent operates on *itself*: a self-model graph (67) and a metacognitive repair loop (66) diagnose and fix faults, capability acquisition (69) grows tools it lacks, calibrated uncertainty (68) and resource self-governance (70) decide *whether* and *how cheaply* to act, memory consolidation (71) prunes and promotes what it has learned, and counterfactual simulation (72) dry-runs irreversible plans before they touch anything real — all walled behind the same throwaway-branch + human-merge gate as governance. The **reflective runtime (73)** wires these into one runnable loop, the way `00` does for the base five.
+- **Reasoning in the world is the Layer-3 set (74–76).** Above self-maintenance, the agent reasons beyond a single turn and a single mind, across *time*, *space*, and *society*: multi-turn deliberation (74) carries one intent across many turns as a plan graph, re-checking its assumptions against the live world and repairing or abandoning it as conditions shift; the belief state (75) holds what the agent thinks is true *with* calibrated confidence, catching and repairing contradictions and predicting an action's effect on a clone; and multi-agent coordination (76) models other minds, earns trust by outcome, and commits a shared plan only on authority and quorum.
 
 These are reference patterns, not a packaged stack: nothing here forces you to adopt the layer above or below it. The map is for orientation — take a single layer, or trace one thread end to end.
 
@@ -216,6 +217,16 @@ The Layer-2 set — the agent operating on *itself*. Each runs on Node built-ins
 | 70 | [Resource Self-Governance](./70-resource-self-governance/) | An agent that always reaches for its best tool behaves correctly right up until it runs out of budget mid-task — and then fails the whole job, often after the expensive part is already spent. |
 | 71 | [Memory Consolidation ("Sleep")](./71-memory-consolidation-sleep/) | While an agent is awake it accumulates raw episodic memories — duplicates and noise included — and without a consolidation pass that store grows without bound and buries its few durable lessons. |
 | 72 | [Counterfactual Simulation](./72-counterfactual-simulation/) | An agent about to run a multi-step plan with a real, irreversible side-effect has no safe way to ask "what happens if I run this?" without running it. |
+
+### Reasoning in the world (time, space, society)
+
+The Layer-3 set — the agent reasoning beyond a single turn and a single mind. Each runs on Node built-ins.
+
+| # | Guide | Summary |
+|---|-------|---------|
+| 74 | [Multi-Turn Deliberation & Multi-Step Planning](./74-multi-turn-deliberation/) | A single-turn agent re-derives its intent from scratch every turn and forgets what it was doing the moment the turn ends; this is the buffer that carries one intent across many turns — a plan graph of subgoals, a per-turn monitor that re-checks assumptions against the live world, splice-in repair, and explicit succeeded/failed/escalated/abandoned termination. |
+| 75 | [World-Model & Belief State](./75-world-model-belief-state/) | An agent that stores facts as bare assertions can't tell a hunch from a near-certainty, has no rule for how an observation should move a fact, and can't notice two beliefs that contradict each other; this folds noisy evidence into calibrated confidence via log-odds, flags and repairs contradictions by weight, and predicts an action's effect on a clone before committing. |
+| 76 | [Multi-Agent Coordination & Social Reasoning](./76-multi-agent-coordination/) | An agent that models the world but not the agents in it will confidently act on a plan everyone else has already abandoned; this is the social layer — modeling what other minds believe, earning and spending trust by outcome, committing a shared plan only on authority and quorum, resolving contradictory claims by rank, and catching a peer whose actions betray its words. |
 
 ## License
 
