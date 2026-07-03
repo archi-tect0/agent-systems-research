@@ -1,7 +1,7 @@
-// Guide 107 — Resonance Probe and Coupling Engine
+// Guide 107 — Concept Subspace Probe and Cross-Model Agreement Scoring
 //
-// A standalone implementation of the resonance-probe pipeline (PCA + Ridge)
-// and the Cross-Model Resonance Coupling (Eq.13) for phase-locked inference.
+// A standalone implementation of the concept-subspace-probe pipeline (PCA + Ridge)
+// and the Cross-Model Agreement Score (Eq.13) for compact-state transfer decisions.
 
 // ── Numeric helpers ───────────────────────────────────────────────────────────
 
@@ -113,10 +113,10 @@ function ridgeRegression(Z: number[][], y: number[], lambda = 1e-4): number[] {
   return aug.map((row) => row[k]);
 }
 
-// ── Resonance Coupling (Eq.13) ───────────────────────────────────────────────
+// ── Cross-Model Agreement Score (Eq.13) ───────────────────────────────────────
 
-interface OscillatorState {
-  omegaBH: number;
+interface ModelSignalState {
+  omega: number;
   tauD: number;
   phase: number;
 }
@@ -124,11 +124,11 @@ interface OscillatorState {
 const OMEGA_REF = 0.50;
 const TAU_REF = 5.00;
 
-function computeResonanceCoupling(
-  server: OscillatorState,
-  local: OscillatorState,
+function computeAgreementScore(
+  server: ModelSignalState,
+  local: ModelSignalState,
 ): number {
-  const omegaDiff = Math.abs(server.omegaBH - local.omegaBH);
+  const omegaDiff = Math.abs(server.omega - local.omega);
   const tauDiff = Math.abs(server.tauD - local.tauD);
   const phaseDiff = server.phase - local.phase;
 
@@ -140,10 +140,10 @@ function computeResonanceCoupling(
 // ── Demo ─────────────────────────────────────────────────────────────────────
 
 async function runDemo() {
-  console.log("--- Resonance Probe Demo ---");
+  console.log("--- Concept Subspace Probe Demo ---");
 
   // 1. Simulate embedding data (N=10 samples, D=16 dims)
-  // Positives (samples that "ring" the concept) vs Negatives
+  // Positives (samples that match the concept) vs Negatives
   const D = 16;
   const positives = Array.from({ length: 6 }, () => 
     Array.from({ length: D }, (_, i) => (i < 4 ? 1 : 0) + Math.random() * 0.1)
@@ -155,7 +155,7 @@ async function runDemo() {
   const allEmbs = [...positives, ...negatives];
   const labels = [...positives.map(() => 1), ...negatives.map(() => -1)];
 
-  // 2. Locate Anchor Subspace
+  // 2. Locate concept subspace
   const mean = meanCol(allEmbs);
   const centrd = center(allEmbs, mean);
   const components = await svdPCA(centrd, 4);
@@ -169,7 +169,7 @@ async function runDemo() {
   }
   normalize(biasVector);
 
-  console.log("Anchor located. Bias vector magnitude normalized.");
+  console.log("Subspace located. Bias vector magnitude normalized.");
 
   // 4. Verification: Check if bias vector aligns with positives
   let posScore = 0;
@@ -185,22 +185,22 @@ async function runDemo() {
 
   if (posScore <= negScore) throw new Error("Bias vector failed to separate classes!");
 
-  console.log("\n--- Resonance Coupling (Eq.13) Demo ---");
+  console.log("\n--- Cross-Model Agreement Score (Eq.13) Demo ---");
 
-  const server: OscillatorState = { omegaBH: 0.12, tauD: 12.0, phase: 0.5 };
-  const localMatched: OscillatorState = { omegaBH: 0.125, tauD: 11.5, phase: 0.52 };
-  const localOut: OscillatorState = { omegaBH: 0.90, tauD: 2.0, phase: 3.14 };
+  const server: ModelSignalState = { omega: 0.12, tauD: 12.0, phase: 0.5 };
+  const localMatched: ModelSignalState = { omega: 0.125, tauD: 11.5, phase: 0.52 };
+  const localOut: ModelSignalState = { omega: 0.90, tauD: 2.0, phase: 3.14 };
 
-  const kresHigh = computeResonanceCoupling(server, localMatched);
-  const kresLow = computeResonanceCoupling(server, localOut);
+  const kresHigh = computeAgreementScore(server, localMatched);
+  const kresLow = computeAgreementScore(server, localOut);
 
-  console.log(`Matched Resonance (Kres): ${kresHigh.toFixed(4)}`);
-  console.log(`Out-of-Sync Resonance (Kres): ${kresLow.toFixed(4)}`);
+  console.log(`Matched Agreement (Kres): ${kresHigh.toFixed(4)}`);
+  console.log(`Out-of-Sync Agreement (Kres): ${kresLow.toFixed(4)}`);
 
-  if (kresHigh < 0.8) throw new Error("Expected high Kres for matched oscillators");
-  if (kresLow > 0.2) throw new Error("Expected low Kres for out-of-sync oscillators");
+  if (kresHigh < 0.8) throw new Error("Expected high Kres for matched signals");
+  if (kresLow > 0.2) throw new Error("Expected low Kres for out-of-sync signals");
 
-  console.log("\n[assertions] PCA convergence + Ridge separation + Eq.13 coupling: PASS");
+  console.log("\n[assertions] PCA convergence + Ridge separation + Eq.13 agreement score: PASS");
 }
 
 function assert(condition: boolean, message: string): void {

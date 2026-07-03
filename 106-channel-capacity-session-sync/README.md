@@ -14,8 +14,8 @@ In a multi-tier agent architecture (e.g., Cloud LLM, Local Ollama, and Client-si
 
 - **Shannon-Hartley Modeling**: Treat each tier as a communication channel defined by $C = B \times \log_2(1 + SNR)$. This provides a unified metric (tokens/sec) that accounts for both raw speed ($B$) and signal fidelity ($SNR$).
 - **Empirical Measurement**: Bandwidth and latency are not assumed; they are measured per-turn using an Exponential Moving Average (EMA) to adapt to changing conditions without being overly reactive to single-turn outliers.
-- **Coupled Information Velocity ($c_k$)**: A physics-derived metric that scales Shannon capacity by topological coupling and Bekenstein saturation. As the context window fills up (high Bekenstein pressure), the effective information velocity slows down.
-- **Nyquist-Bekenstein Coherence**: Extends the classical Nyquist sampling theorem to cognitive state. It defines a minimum "turn frequency" ($f_{NB}$) required to prevent context aliasing, which increases as the session approaches its information bound.
+- **Coupled Information Velocity ($c_k$)**: A derived metric that scales Shannon capacity by a topological-coupling factor and by how close the session is to its context budget (see [Guide 104](../104-entropy-budget-admission-control/)). As the context window fills up, the effective information velocity slows down.
+- **Turn-Frequency Coherence Check**: Applies the Nyquist sampling theorem to conversational turns. It defines a minimum "turn frequency" ($f_N$) required to prevent context aliasing, which increases as the session approaches its context budget.
 - **Session Sync Injection**: The measured capacities are injected back into the agent's prompt, allowing the agent to be "self-aware" of its current communication constraints and adjust its verbosity or tool usage accordingly.
 
 ## Algorithm
@@ -31,17 +31,17 @@ state.bandwidth = EMA(state.bandwidth, bandwidth)
 state.capacity  = EMA(state.capacity, capacity)
 state.latency   = EMA(state.latency, firstTokenTime)
 
-// 3. Compute Physics-Derived Velocity (c_k)
-ck = capacity * kappa * (1 - bekensteinSaturation)^0.5
+// 3. Compute Coupled Information Velocity (c_k)
+ck = capacity * kappa * (1 - contextSaturation)^0.5
 
-// 4. Check Coherence (Nyquist-Bekenstein)
-f_Nyquist = (2 * decoherenceRate) / (1 - bekensteinSaturation + epsilon)
+// 4. Check Coherence (Turn-Frequency / Nyquist)
+f_Nyquist = (2 * driftRate) / (1 - contextSaturation + epsilon)
 undersampled = (timeSinceLastTurn > 1 / f_Nyquist)
 ```
 
 ## Reference implementation
 
-The reference implementation models a three-brain triangle and tracks their capacities through simulated turns. It also demonstrates the Nyquist-Bekenstein coherence check under different saturation levels.
+The reference implementation models a three-tier routing triangle (cloud/local/client) and tracks their capacities through simulated turns. It also demonstrates the turn-frequency coherence check under different saturation levels.
 
 ```bash
 node index.ts --demo
@@ -51,4 +51,4 @@ node index.ts --demo
 
 - **SNR Estimation**: Signal-to-Noise Ratio (SNR) is currently estimated based on protocol overhead and compression ratios. A more advanced implementation could use semantic similarity between raw and compressed prompts to measure actual information loss.
 - **TDM vs. FDM**: The current model assumes Time-Division Multiplexing (one brain at a time). A multi-modal or parallel-mind system could use these metrics for Frequency-Division Multiplexing, splitting different parts of a task across multiple channels simultaneously.
-- **Decoherence Rate**: The `decoherenceRate` is assumed to be a known constant per-turn; in reality, it varies based on the complexity and "drift" of the conversation topic.
+- **Drift Rate**: The `driftRate` is assumed to be a known constant per-turn; in reality, it varies based on the complexity and "drift" of the conversation topic.

@@ -1,4 +1,4 @@
-# Guide 108 — THB Closed-Loop Calibration and Warmup
+# Guide 108 — Closed-Loop Constant Calibration with Synthetic Warmup
 
 *Part of the [research/ index](../README.md) — see [Start Here](../README.md#start-here) for the recommended reading order.*
 
@@ -15,8 +15,8 @@ Heuristic-based agent systems rely on "magic constants" (thresholds, coupling we
 - **Closed-Loop Feedback**: The system records per-turn "observations" (internal state like entropy or criticality) and later joins them with "outcome events" (real-world results like user satisfaction, task success, or memory recall hits). The residual error between predicted and actual outcomes drives the update.
 - **Bounded Exponential Moving Average (EMA)**: To prevent radical swings from noisy data or "calibration poisoning," updates are limited to a small percentage (e.g., ≤5%) of the current value per calibration run.
 - **Bootstrap Gate**: Calibration only starts after a minimum density of samples (e.g., 30 samples) is reached, ensuring the update signal isn't derived from a tiny, unrepresentative window.
-- **Synthetic Warmup Harness**: To avoid a "cold start" where the system runs on suboptimal defaults for days while waiting for real traffic, a warmup engine generates synthetic observations and outcomes using the real physics equations and a Reproducible Random Generator.
-- **Phantom Wallet Namespacing**: Synthetic data is tagged with a dedicated "phantom" wallet identifier (e.g., `phantom:thb-warmup`). This ensures that synthetic telemetry can seed the calibration engine without polluting real user analytics or identity state.
+- **Synthetic Warmup Harness**: To avoid a "cold start" where the system runs on suboptimal defaults for days while waiting for real traffic, a warmup engine generates synthetic observations and outcomes using the same scoring functions used in production and a reproducible random generator.
+- **Namespaced Synthetic Wallet**: Synthetic data is tagged with a dedicated "phantom" wallet identifier (e.g., `phantom:calibration-warmup`). This ensures that synthetic telemetry can seed the calibration engine without polluting real user analytics or identity state.
 - **Invariant Safety Rails**: Hard bounds and logical invariants (e.g., `T_WARN` must always be less than `T_CRITICAL`) are checked before any update is committed. If a calibration run would break an invariant, it is rolled back.
 
 ## Algorithm
@@ -50,10 +50,10 @@ function runCalibration():
 function runWarmup(n_samples):
   for i from 1 to n_samples:
     inputState = generateRealisticRandomState(seed: i)
-    observations = executeRealPhysicsEquations(inputState)
+    observations = executeScoringFunctions(inputState)
     outcomes = generateSyntheticOutcomes(observations)
     
-    writeToDb(wallet: "phantom:thb-warmup", observations, outcomes)
+    writeToDb(wallet: "phantom:calibration-warmup", observations, outcomes)
 ```
 
 ## Reference implementation

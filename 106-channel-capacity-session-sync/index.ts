@@ -24,7 +24,7 @@ interface NyquistState {
 }
 
 const EMA_ALPHA = 0.3;
-const GAMMA_BEK = 0.5;
+const GAMMA_SAT = 0.5;
 
 const BASELINE_SNR: Record<LayerKind, number> = {
   cloud: 100.0,
@@ -63,11 +63,11 @@ function getChannelState(layer: LayerKind): ChannelState {
 
 function computeCCoupled(
   C_SH: number,
-  bekSaturation: number = 0,
+  contextSaturation: number = 0,
   kappaTopological: number = 1.0,
 ): number {
-  const sigma = Math.min(1, Math.max(0, bekSaturation));
-  return C_SH * kappaTopological * Math.pow(1 - sigma, GAMMA_BEK);
+  const sigma = Math.min(1, Math.max(0, contextSaturation));
+  return C_SH * kappaTopological * Math.pow(1 - sigma, GAMMA_SAT);
 }
 
 function recordTurn(
@@ -76,7 +76,7 @@ function recordTurn(
   totalTokens: number,
   wallMs: number,
   compressionRatio = 0,
-  bekSaturation = 0,
+  contextSaturation = 0,
 ): void {
   const st = getChannelState(layer);
 
@@ -91,7 +91,7 @@ function recordTurn(
   const C = α * newC + (1 - α) * st.capacityTokSec;
   const τ = α * firstTokenMs + (1 - α) * st.propagDelayMs;
 
-  const cCoupled = computeCCoupled(C, bekSaturation);
+  const cCoupled = computeCCoupled(C, contextSaturation);
 
   states.set(layer, {
     layer,
@@ -105,15 +105,15 @@ function recordTurn(
 }
 
 function getNyquistState(
-  decoherenceRate: number,
+  driftRate: number,
   silenceMin: number,
-  bekSaturation: number = 0,
+  contextSaturation: number = 0,
 ): NyquistState {
   const EPS = 0.01;
-  const safeRate = Math.max(Math.abs(decoherenceRate), EPS);
-  const sigma = Math.min(1 - EPS, Math.max(0, bekSaturation));
+  const safeRate = Math.max(Math.abs(driftRate), EPS);
+  const sigma = Math.min(1 - EPS, Math.max(0, contextSaturation));
   
-  // Eq.3: Nyquist-Bekenstein
+  // Eq.3: Turn-frequency floor
   const fNyquistTurnsPerTurn = (2 * safeRate) / (1 - sigma + EPS);
   
   // Reference: 2 turns/minute baseline
@@ -153,17 +153,17 @@ if (process.argv.includes("--demo")) {
   assert(cloudUpdated.sampleCount === 1, "Sample count should be 1");
   assert(cloudUpdated.propagDelayMs < 600, "Latency should decrease after a 400ms turn");
 
-  // Scenario 3: Bekenstein pressure on information velocity (c_k)
-  console.log("\n[Action] Recording turns with high Bekenstein saturation...");
+  // Scenario 3: Context-saturation pressure on information velocity (c_k)
+  console.log("\n[Action] Recording turns with high context saturation...");
   recordTurn("local", 100, 100, 2000, 0, 0.9); // 90% saturated
   const localSaturated = getChannelState("local");
   console.log(`[Local Saturated] C=${localSaturated.capacityTokSec.toFixed(1)}, c_k=${localSaturated.cCoupled.toFixed(1)}`);
   
   const cCoupledTheoretical = computeCCoupled(localSaturated.capacityTokSec, 0.9);
-  assert(Math.abs(localSaturated.cCoupled - cCoupledTheoretical) < 0.1, "c_k should match theoretical physics bound");
+  assert(Math.abs(localSaturated.cCoupled - cCoupledTheoretical) < 0.1, "c_k should match the theoretical bound");
   assert(localSaturated.cCoupled < localSaturated.capacityTokSec, "c_k should be throttled by saturation");
 
-  // Scenario 4: Nyquist-Bekenstein Coherence
+  // Scenario 4: Turn-Frequency Coherence
   console.log("\n[Coherence Check] Normal saturation (sigma=0.1), 1 min silence:");
   const nyquistOK = getNyquistState(0.05, 1.0, 0.1);
   console.log(`  tau_N=${nyquistOK.tauNyquistMin.toFixed(2)} min, undersampled=${nyquistOK.undersampled}`);

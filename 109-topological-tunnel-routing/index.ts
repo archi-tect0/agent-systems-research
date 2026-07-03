@@ -6,7 +6,7 @@
 // the tunneling gain and channel capacity coupling.
 
 /**
- * THB Eq.4: Topological Tunneling Gain
+ * Eq.4: Topological Tunneling Gain
  * G_topo = exp(−β₁ / (β₀ + 1))
  *
  * κ_topo = 1 + (β₀ − 1) × CLUSTER_BONUS − β₁ × LOOP_PENALTY

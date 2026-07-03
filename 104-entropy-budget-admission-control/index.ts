@@ -1,41 +1,41 @@
-// Guide 104 — Bekenstein Bound Entropy Gating with Admission Control
+// Guide 104 — Entropy-Budget Admission Control
 //
-// A cognitive admission-control pattern that uses an information-theoretic 
-// entropy ceiling to prevent session decoherence and context displacement.
+// An admission-control pattern that uses an information-theoretic
+// entropy budget to prevent runaway context growth and silent context displacement.
 
-interface BekensteinState {
+interface EntropyBudgetState {
   currentInfo: number;    // Current total information content (nats)
-  maxInfo: number;        // Cognitive Bekenstein bound (S_max)
+  maxInfo: number;        // Entropy budget ceiling (S_max)
   saturation: number;     // currentInfo / maxInfo
   headroom: number;       // Remaining capacity
   nearBound: boolean;     // Saturation > 0.85
-  holographic: {
+  invariantCoverage: {
     invariantDOF: number; // Size of the invariant set G
     requiredDOF: number;  // DOF needed for lossless encoding
     complete: boolean;    // requiredDOF <= invariantDOF
   };
 }
 
-// Calibration constants (matching artifacts/api-server/src/lib/bekensteinBound.ts)
+// Calibration constants (matching artifacts/api-server/src/lib/entropyBudget.ts)
 const KAPPA = 2.5;
 const T_BASE = 4096;
 const DEPTH_BASE = 1.0;
 const INVARIANT_DOF_DEFAULT = 7;
 
 /**
- * Compute the cognitive Bekenstein bound.
+ * Compute the entropy budget ceiling.
  * 
  * @param totalEntropy Total measured entropy across subsystems (nats)
  * @param contextTokens Available context window size
- * @param depth Total tool calls/reasoning cycles (adds "energy")
+ * @param depth Total tool calls/reasoning cycles (expands the ceiling)
  * @param invariants Number of active kernel invariants (G-set)
  */
-function computeBekensteinState(
+function computeEntropyBudgetState(
   totalEntropy: number,
   contextTokens: number = 32000,
   depth: number = 0,
   invariants: number = INVARIANT_DOF_DEFAULT
-): BekensteinState {
+): EntropyBudgetState {
   const depthFactor = DEPTH_BASE + Math.log1p(depth) * 0.2;
   const contextRatio = Math.max(1, contextTokens / T_BASE);
   const maxInfo = KAPPA * Math.log2(contextRatio) * depthFactor;
@@ -49,7 +49,7 @@ function computeBekensteinState(
     saturation,
     headroom: Math.max(0, maxInfo - totalEntropy),
     nearBound: saturation > 0.85,
-    holographic: {
+    invariantCoverage: {
       invariantDOF: invariants,
       requiredDOF,
       complete: requiredDOF <= invariants
@@ -76,10 +76,10 @@ class AdmissionGate {
 
   /**
    * Propose adding a new block of information.
-   * Returns true if admitted, false if rejected by the Bekenstein bound.
+   * Returns true if admitted, false if rejected by the entropy budget.
    */
   propose(newEntropy: number): { admitted: boolean; reason?: string } {
-    const projectedState = computeBekensteinState(
+    const projectedState = computeEntropyBudgetState(
       this.entropy + newEntropy,
       this.contextSize,
       this.depth,
@@ -89,14 +89,14 @@ class AdmissionGate {
     if (projectedState.saturation > 1.0) {
       return { 
         admitted: false, 
-        reason: `Bekenstein bound exceeded (${(projectedState.saturation * 100).toFixed(1)}%). Context displacement guaranteed.` 
+        reason: `Entropy budget exceeded (${(projectedState.saturation * 100).toFixed(1)}%). Context displacement likely on next turn.` 
       };
     }
 
-    if (!projectedState.holographic.complete) {
-      // In this demo, we admit but warn for sub-holographic state.
+    if (!projectedState.invariantCoverage.complete) {
+      // In this demo, we admit but warn when invariant coverage is insufficient.
       // A stricter gate might reject here.
-      console.log(`[Gate] Warning: Sub-holographic state. Deficit: ${projectedState.holographic.requiredDOF - projectedState.holographic.invariantDOF} DOF.`);
+      console.log(`[Gate] Warning: Invariant coverage insufficient. Deficit: ${projectedState.invariantCoverage.requiredDOF - projectedState.invariantCoverage.invariantDOF} DOF.`);
     }
 
     this.entropy += newEntropy;
@@ -108,7 +108,7 @@ class AdmissionGate {
   }
 
   getState() {
-    return computeBekensteinState(this.entropy, this.contextSize, this.depth, this.invariants);
+    return computeEntropyBudgetState(this.entropy, this.contextSize, this.depth, this.invariants);
   }
 }
 
@@ -121,7 +121,7 @@ function assert(condition: boolean, message: string): void {
 }
 
 if (process.argv.includes("--demo")) {
-  console.log("--- Bekenstein Bound Entropy Gating Demo ---\n");
+  console.log("--- Entropy-Budget Admission Control Demo ---\n");
 
   const gate = new AdmissionGate(16384, 7); // 16K context, 7 invariants
   
@@ -146,7 +146,7 @@ if (process.argv.includes("--demo")) {
   console.log(`Rejected: ${overflow.reason}\n`);
 
   console.log("Scenario 4: Depth expansion...");
-  console.log("Making tool calls to expand the bound...");
+  console.log("Making tool calls to expand the budget...");
   for (let i = 0; i < 5; i++) gate.incrementDepth();
   
   const stateAfterDepth = gate.getState();
@@ -159,17 +159,17 @@ if (process.argv.includes("--demo")) {
   assert(retry.admitted, "Should now admit the previously rejected block due to depth expansion");
   console.log("Admitted 1.0 nats after depth expansion.\n");
 
-  console.log("Scenario 5: Holographic check...");
+  console.log("Scenario 5: Invariant coverage check...");
   const highEntropy = gate.propose(2.0); // Total ~8.0 nats
   const finalState = gate.getState();
   console.log(`Final entropy: ${finalState.currentInfo.toFixed(2)} nats`);
-  console.log(`Required DOF: ${finalState.holographic.requiredDOF}`);
-  console.log(`Current DOF: ${finalState.holographic.invariantDOF}`);
+  console.log(`Required DOF: ${finalState.invariantCoverage.requiredDOF}`);
+  console.log(`Current DOF: ${finalState.invariantCoverage.invariantDOF}`);
   
   // 8.0 / ln(2) approx 11.54 -> requiredDOF = 12.
-  assert(!finalState.holographic.complete, "Should be sub-holographic");
-  assert(finalState.holographic.requiredDOF > finalState.holographic.invariantDOF, "Required DOF should exceed invariants");
+  assert(!finalState.invariantCoverage.complete, "Should be under-provisioned");
+  assert(finalState.invariantCoverage.requiredDOF > finalState.invariantCoverage.invariantDOF, "Required DOF should exceed invariants");
   
-  console.log("\n[property checks] saturation gating + depth expansion + holographic check: PASS");
+  console.log("\n[property checks] saturation gating + depth expansion + invariant coverage check: PASS");
   console.log("\nGuide 104 demo complete.");
 }

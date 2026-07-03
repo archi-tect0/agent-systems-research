@@ -1,4 +1,4 @@
-// Guide 108 — THB Closed-Loop Calibration and Warmup
+// Guide 108 — Closed-Loop Constant Calibration with Synthetic Warmup
 //
 // Demonstrates a self-tuning threshold that updates from empirical results
 // via a bounded EMA, seeded by a synthetic warmup harness.
@@ -37,7 +37,7 @@ function dbReset() {
 // Warmup Harness
 // ---------------------------------------------------------------------------
 
-const PHANTOM_WALLET = "phantom:thb-warmup";
+const PHANTOM_WALLET = "phantom:calibration-warmup";
 
 /** 
  * Synthetic warmup generates data where the "ideal" threshold should be 0.70.
@@ -117,7 +117,7 @@ function runCalibration(current: Constants): Constants {
 // ---------------------------------------------------------------------------
 
 async function runDemo() {
-  console.log("--- THB Calibration & Warmup Demo ---");
+  console.log("--- Closed-Loop Calibration & Warmup Demo ---");
   dbReset();
 
   // Initial state: threshold is way too low (0.3), should be near 0.7

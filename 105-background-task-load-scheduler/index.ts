@@ -1,7 +1,7 @@
-// Guide 105 — Parallel Mind Background Physics Engine
+// Guide 105 — Background Task Load and Return-Pressure Scheduler
 //
-// Standalone implementation of THB Eq.24 and Eq.25: Parallel Mind background physics.
-// This model governs the cognitive load (entropy) of background tasks and the 
+// Standalone implementation of Eq.24 and Eq.25: background task load and return pressure.
+// This model governs the load (entropy) imposed by background tasks and the 
 // return pressure of suspended threads.
 
 interface BackgroundTask {
@@ -14,12 +14,12 @@ interface BackgroundTask {
 const MAX_TASKS = 3;
 
 /**
- * Eq.24 — Background Entropy Load (H_bg)
+ * Eq.24 — Background Load (H_bg)
  * H_bg = 1 - exp(−Σ_i w_i × u_i)
  * 
- * Measures the cognitive load imposed by background tasks.
+ * Measures the load imposed by background tasks.
  */
-function computeBackgroundEntropyLoad(tasks: BackgroundTask[]): number {
+function computeBackgroundLoad(tasks: BackgroundTask[]): number {
   let sum_wu = 0;
   for (const task of tasks) {
     if (task.status === 'completed' || task.status === 'failed') continue;
@@ -62,7 +62,7 @@ class BackgroundManager {
   enqueue(id: string, priority: number): void {
     const activeTasks = this.tasks.filter(t => ['queued', 'active', 'verifying'].includes(t.status));
     if (activeTasks.length >= MAX_TASKS) {
-      throw new Error("Bekenstein saturation reached: maximum background tasks allowed.");
+      throw new Error("Concurrency cap reached: maximum background tasks allowed.");
     }
 
     this.tasks.push({
@@ -78,8 +78,8 @@ class BackgroundManager {
     if (task) task.status = status;
   }
 
-  getEntropy(): number {
-    return computeBackgroundEntropyLoad(this.tasks);
+  getLoad(): number {
+    return computeBackgroundLoad(this.tasks);
   }
 
   getPressure(id: string, now: number): number {
@@ -98,42 +98,42 @@ function assert(condition: boolean, message: string): void {
 }
 
 if (process.argv.includes("--demo")) {
-  console.log("Running Parallel Mind Background Physics demo...");
+  console.log("Running Background Task Load and Return-Pressure Scheduler demo...");
 
   const manager = new BackgroundManager();
   const now = Date.now();
 
-  // 1. Enqueue tasks and check entropy
+  // 1. Enqueue tasks and check load
   manager.enqueue("task_1", 8); // High priority
-  console.log(`[step 1] task_1 enqueued (priority 8). Entropy: ${manager.getEntropy().toFixed(4)}`);
-  assert(manager.getEntropy() > 0, "Entropy should be positive after enqueuing a task");
+  console.log(`[step 1] task_1 enqueued (priority 8). Load: ${manager.getLoad().toFixed(4)}`);
+  assert(manager.getLoad() > 0, "Load should be positive after enqueuing a task");
 
   manager.enqueue("task_2", 5); // Medium priority
-  console.log(`[step 2] task_2 enqueued (priority 5). Entropy: ${manager.getEntropy().toFixed(4)}`);
+  console.log(`[step 2] task_2 enqueued (priority 5). Load: ${manager.getLoad().toFixed(4)}`);
 
   manager.enqueue("task_3", 2); // Low priority
-  console.log(`[step 3] task_3 enqueued (priority 2). Entropy: ${manager.getEntropy().toFixed(4)}`);
+  console.log(`[step 3] task_3 enqueued (priority 2). Load: ${manager.getLoad().toFixed(4)}`);
 
-  // 2. Check saturation
+  // 2. Check the concurrency cap
   try {
     manager.enqueue("task_4", 10);
-    assert(false, "Should have thrown saturation error");
+    assert(false, "Should have thrown a concurrency-cap error");
   } catch (e: any) {
     console.log(`[step 4] Saturation check: ${e.message}`);
-    assert(e.message.includes("Bekenstein saturation reached"), "Expected saturation error message");
+    assert(e.message.includes("Concurrency cap reached"), "Expected concurrency-cap error message");
   }
 
-  // 3. Test status weights on entropy
-  const h_queued = manager.getEntropy();
+  // 3. Test status weights on load
+  const h_queued = manager.getLoad();
   manager.updateStatus("task_1", "active");
-  const h_active = manager.getEntropy();
-  console.log(`[step 5] task_1 set to 'active'. Entropy: ${h_active.toFixed(4)} (was ${h_queued.toFixed(4)})`);
-  assert(h_active < h_queued, "Entropy should decrease as tasks move from queued to active");
+  const h_active = manager.getLoad();
+  console.log(`[step 5] task_1 set to 'active'. Load: ${h_active.toFixed(4)} (was ${h_queued.toFixed(4)})`);
+  assert(h_active < h_queued, "Load should decrease as tasks move from queued to active");
 
   manager.updateStatus("task_1", "verifying");
-  const h_verifying = manager.getEntropy();
-  console.log(`[step 6] task_1 set to 'verifying'. Entropy: ${h_verifying.toFixed(4)}`);
-  assert(h_verifying < h_active, "Entropy should decrease further in verifying state");
+  const h_verifying = manager.getLoad();
+  console.log(`[step 6] task_1 set to 'verifying'. Load: ${h_verifying.toFixed(4)}`);
+  assert(h_verifying < h_active, "Load should decrease further in verifying state");
 
   // 4. Test Thread Return Pressure (Eq. 25)
   const p_initial = manager.getPressure("task_2", now);
@@ -148,9 +148,9 @@ if (process.argv.includes("--demo")) {
   manager.updateStatus("task_1", "completed");
   manager.updateStatus("task_2", "completed");
   manager.updateStatus("task_3", "completed");
-  console.log(`[step 8] All tasks completed. Entropy: ${manager.getEntropy().toFixed(4)}`);
-  assert(manager.getEntropy() === 0, "Entropy should be 0 when all tasks are completed");
+  console.log(`[step 8] All tasks completed. Load: ${manager.getLoad().toFixed(4)}`);
+  assert(manager.getLoad() === 0, "Load should be 0 when all tasks are completed");
 
-  console.log("\n[property checks] Eq.24 entropy load + Eq.25 pressure decay + saturation limits: PASS");
+  console.log("\n[property checks] Eq.24 load + Eq.25 pressure decay + concurrency cap: PASS");
   console.log("\nGuide 105 demo complete.");
 }
