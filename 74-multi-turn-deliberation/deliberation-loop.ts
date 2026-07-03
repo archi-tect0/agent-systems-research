@@ -48,7 +48,7 @@
 
 type World = Record<string, boolean | number>;
 
-function kylumWorld(overrides?: World): World {
+function demoWorld(overrides?: World): World {
   return {
     rootGoalValid: true,
     hasPasskey: false,
@@ -262,7 +262,7 @@ function demo() {
   banner("Scenario 1 — happy path: one intent carried across turns to completion");
   {
     const engine = new DeliberationEngine(EFFECTS);
-    const world = kylumWorld();
+    const world = demoWorld();
     const d = freshDeliberation(savingsPlan(0.5));
     engine.run(d, world);
     printRun(d);
@@ -273,7 +273,7 @@ function demo() {
   banner("Scenario 2 — assumption breaks mid-plan: monitor catches it, repair splices an enabler");
   {
     const engine = new DeliberationEngine(EFFECTS);
-    const world = kylumWorld();
+    const world = demoWorld();
     const d = freshDeliberation(savingsPlan(0.5));
     // New information: the network drops at the start of turn 4, right before the transfer.
     const tape: Array<(w: World) => void> = [];
@@ -287,7 +287,7 @@ function demo() {
   banner("Scenario 3 — risk escalation: a high-stakes step pauses for a human, no side effect");
   {
     const engine = new DeliberationEngine(EFFECTS);
-    const world = kylumWorld();
+    const world = demoWorld();
     const d = freshDeliberation(savingsPlan(0.95)); // transfer now exceeds the ceiling
     engine.run(d, world);
     printRun(d);
@@ -297,7 +297,7 @@ function demo() {
   banner("Scenario 4 — abandonment: new info invalidates the goal, confidence collapses");
   {
     const engine = new DeliberationEngine(EFFECTS);
-    const world = kylumWorld();
+    const world = demoWorld();
     const d = freshDeliberation(savingsPlan(0.5));
     // New information: the user already moved the funds elsewhere at the start of turn 2.
     const tape: Array<(w: World) => void> = [];
@@ -316,5 +316,5 @@ if (process.argv.includes("--demo")) {
   demo();
 }
 
-export { DeliberationEngine, kylumWorld, savingsPlan, freshDeliberation, EFFECTS, REPAIRS };
+export { DeliberationEngine, demoWorld, savingsPlan, freshDeliberation, EFFECTS, REPAIRS };
 export type { World, Subgoal, PlanGraph, Deliberation, Effects };

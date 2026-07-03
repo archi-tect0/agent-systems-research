@@ -5,7 +5,7 @@
 
 *Reasoning in a society of minds — modeling what other agents and humans believe, earning and spending trust by outcome, agreeing on a shared plan only when authority and quorum are met, resolving contradictory claims by rank rather than by guess, and catching a peer whose actions betray its words.*
 
-The whole research set so far has built a single agent that reasons about the world ([guide 75](../75-world-model-belief-state/)) and about itself (the Layer-2 set) over time ([guide 74](../74-multi-turn-deliberation/)). But Kylum never acts alone: it shares custody with guardians ([guide 29](../29-quorum-vault-groups/)), delegates work to other agents over the A2A marketplace ([guide 28](../28-a2a-marketplace/)), and answers to a human who holds the passkey floor. This guide is the social layer — what the agent needs to reason *with* and *about* other minds.
+The whole research set so far has built a single agent that reasons about the world ([guide 75](../75-world-model-belief-state/)) and about itself (the Layer-2 set) over time ([guide 74](../74-multi-turn-deliberation/)). But the agent never acts alone: it shares custody with guardians ([guide 29](../29-quorum-vault-groups/)), delegates work to other agents over the A2A marketplace ([guide 28](../28-a2a-marketplace/)), and answers to a human who holds the passkey floor. This guide is the social layer — what the agent needs to reason *with* and *about* other minds.
 
 This is the third guide in the Layer-3 set, and the one that closes the triad: deliberation is *time*, the belief state is *space*, and coordination is *society*. An agent that models the world but not the agents in it will confidently act on a plan everyone else has already abandoned.
 
@@ -80,7 +80,7 @@ node multi-agent-coordination.ts --demo
 npx tsx multi-agent-coordination.ts --demo
 ```
 
-The demo puts Kylum in a small society — a co-signing agent, two oracles, two guardians, and a human — and exercises four scenarios:
+The demo puts the agent in a small society — a co-signing agent, two oracles, two guardians, and a human — and exercises four scenarios:
 
 1. **Theory of mind** — the agent's world-belief (the network has degraded) diverges from what it models a delegated executor still believing, and the coordination gap is surfaced so the two can re-sync before acting.
 2. **Trust by outcome** — one oracle's claims keep proving true and another's keep proving false; their trust scores move apart, and the same new claim from each then carries very different weight into the belief state.

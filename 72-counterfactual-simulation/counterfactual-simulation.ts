@@ -53,7 +53,7 @@ type World = {
   confirmations: number;
 };
 
-function kylumWorld(overrides?: Partial<World>): World {
+function demoWorld(overrides?: Partial<World>): World {
   return {
     walletBalanceEth: 0,
     appInstalled: false,
@@ -271,7 +271,7 @@ function demo() {
 
   banner("Scenario 1 — a feasible plan: dry-run succeeds, real state untouched");
   {
-    const world = kylumWorld({ walletBalanceEth: 2, appInstalled: true, hasPasskey: true, recipientWhitelisted: true });
+    const world = demoWorld({ walletBalanceEth: 2, appInstalled: true, hasPasskey: true, recipientWhitelisted: true });
     const plan = [sendEth(1), confirmTx];
     const r = sim.simulate(world, plan);
     printTrace(r);
@@ -281,7 +281,7 @@ function demo() {
 
   banner("Scenario 2 — an infeasible plan: the first unmet precondition is surfaced");
   {
-    const world = kylumWorld({ walletBalanceEth: 2, appInstalled: true, hasPasskey: false, recipientWhitelisted: false });
+    const world = demoWorld({ walletBalanceEth: 2, appInstalled: true, hasPasskey: false, recipientWhitelisted: false });
     const plan = [sendEth(1), confirmTx];
     const r = sim.simulate(world, plan);
     printTrace(r);
@@ -291,7 +291,7 @@ function demo() {
 
   banner("Scenario 3 — counterfactual failure branch: would this plan STRAND the user?");
   {
-    const world = kylumWorld({ walletBalanceEth: 2, appInstalled: true, hasPasskey: true, recipientWhitelisted: true });
+    const world = demoWorld({ walletBalanceEth: 2, appInstalled: true, hasPasskey: true, recipientWhitelisted: true });
     const plan = [sendEth(1), confirmTx];
     const r = sim.simulate(world, plan);
     const rb = r.riskBranch!;
@@ -302,7 +302,7 @@ function demo() {
 
   banner("Scenario 4 — plan repair: splice in enablers until the plan is feasible");
   {
-    const world = kylumWorld({ walletBalanceEth: 2 }); // nothing set up: no app, no passkey, not whitelisted
+    const world = demoWorld({ walletBalanceEth: 2 }); // nothing set up: no app, no passkey, not whitelisted
     const plan = [sendEth(1), confirmTx];
     const before = sim.simulate(world, plan);
     console.log(`  original plan feasible=${before.feasible} (fails: ${before.firstFailure!.reason})`);
@@ -323,5 +323,5 @@ if (process.argv.includes("--demo")) {
   demo();
 }
 
-export { CounterfactualSimulator, kylumWorld, sendEth, confirmTx, ENABLERS };
+export { CounterfactualSimulator, demoWorld, sendEth, confirmTx, ENABLERS };
 export type { World, Action, Precheck, StepTrace, SimResult };

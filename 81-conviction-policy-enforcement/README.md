@@ -9,7 +9,7 @@
 
 Guides 38, 39, and 77 each address a fragment of the same core challenge:
 
-- **Guide 38** (constitutional AI alignment): How does Kylum's personality and behaviour remain aligned with the user's declared values over time?
+- **Guide 38** (constitutional AI alignment): How does the agent's personality and behaviour remain aligned with the user's declared values over time?
 - **Guide 39** (authority bands): How does the system gate tool calls by risk tier, preventing high-impact actions from firing without appropriate authorisation?
 - **Guide 77** (polyphonic cognition): How does the system surface and preserve internal disagreement between faculties rather than silently overriding dissent?
 
@@ -62,7 +62,7 @@ In isolation, each guide provides a useful primitive. But without a **unified en
 │               │ self_audit reflection                        │
 │    ┌──────────▼─────────────────────────────┐               │
 │    │  6. Conviction store update            │               │
-│    │  If Kai triggers commitSelfMod() with  │               │
+│    │  If it triggers commitSelfMod() with   │               │
 │    │  the dissent insight, it becomes a     │               │
 │    │  new conviction for future enforcement │               │
 │    └────────────────────────────────────────┘               │

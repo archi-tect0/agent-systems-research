@@ -6,7 +6,7 @@ This is shared in the spirit of *here is how I approached these problems, in cas
 
 ## What this is — and isn't
 
-- **It is** 99 self-contained, runnable reference implementations with the reasoning attached (numbered 1–101; 73 and 89 are reserved/retired and intentionally absent — see the catalog below for the live list). Most code you find online shows you *what*; these try to show you *how* it actually works, not just the rationale for building it.
+- **It is** 108 self-contained, runnable reference implementations with the reasoning attached (numbered 1–110; 73 and 89 are reserved/retired and intentionally absent — see the catalog below for the live list). Most code you find online shows you *what*; these try to show you *how* it actually works, not just the rationale for building it.
 - **It is not** an audited, production-ready library. Each implementation isolates a single idea so it can be read and run in a few minutes. Several deliberately reimplement an idea on Node.js built-ins just to stay runnable; each guide notes where a real system would reach for a vetted dependency instead.
 - **The cryptography here is educational.** Where a guide hand-rolls a primitive it says so, and points to what production should use (`@noble/*`, `ethers`, audited libraries). Read those as *the shape of the technique*, not *ship this as-is*.
 
@@ -76,7 +76,7 @@ exercise all five. The guides below are the ways to push each primitive further.
 
 ## Start here
 
-99 guides is too many to read cold. If you want to build toward guide 100/101's level of sophistication from scratch, this is the dependency-respecting order — each phase assumes the previous one is in place:
+108 guides is too many to read cold. If you want to build toward guide 100/101's level of sophistication from scratch, this is the dependency-respecting order — each phase assumes the previous one is in place:
 
 ```mermaid
 flowchart LR
@@ -178,6 +178,7 @@ That's the whole runtime — memory, tool routing, governance, wallet limits, an
 | 75 | [World-Model Belief State](./75-world-model-belief-state/) | What the agent believes is *true* while it acts: claims weighted by source trust, decayed by age, contradiction-resolved, and revised as evidence arrives. |
 | 79 | [Encrypted Offline Memory Cache](./79-encrypted-offline-memory-cache/) | WebCrypto AES-GCM per-entry encryption + Bloom-filter recall index lets the agent access episodic memory when the network is unavailable, without leaking plaintext to extensions or scripts. |
 | 82 | [Proactive Memory Pre-injection](./82-proactive-memory-injection/) | Surfaces episodic memories into the system prompt before the LLM speaks, eliminating the recall round-trip and closing the "cold first reply" gap for sovereign AI workloads. |
+| 109 | [Topological Tunneling Gain via Memory Graph Analysis](./109-topological-tunnel-routing/) | Reduces a memory graph's cluster/loop structure to Betti-number proxies (β₀ clusters, β₁ sparse loops) and turns fragmentation into a tunneling-gain penalty and a channel-capacity coupling term — a topology-aware alternative to treating recall quality as a flat similarity score. |
 
 ### Model routing, tool orchestration, and adaptation
 
@@ -193,6 +194,8 @@ That's the whole runtime — memory, tool routing, governance, wallet limits, an
 | 55 | [Dependency-Aware Parallel Tool Dispatch](./55-tool-dependency-dag/) | Builds a topological DAG of tool calls, running independent nodes concurrently and chaining dependents on their inputs. |
 | 56 | [Speculative Tool Prefetch](./56-speculative-tool-prefetch/) | A small predictor watches a stream's first tokens to pre-execute likely tools in the background, turning tool waits into cache hits. |
 | 58 | [Batched Intent Collapse with Merkle Fan-Out](./58-batched-intent-collapse/) | Deduplicates shared context across many pending intents into one dense call anchored by a Merkle root, then fans results back out per virtual channel. |
+| 103 | [GPU Mesh Registry with Invariant-Sector Affinity](./103-gpu-mesh-invariant-affinity/) | A trust-tiered GPU worker registry with challenge-response enrollment, multi-factor request scoring (trust bonus, load penalty, KV-shard affinity, invariant-sector affinity for warm early-layer VRAM), and automatic revocation after repeated failed proofs. |
+| 107 | [Resonance Probe and Coupling Engine](./107-resonance-probe-coupling/) | Locates a concept's attractor subspace in embedding space via power-iteration PCA and ridge regression, then measures phase-locking between a server model and a local model as a coupling coefficient — the signal that decides how much a local adaptation can be trusted. |
 
 ### Governance, policy, and safe-action control
 
@@ -209,6 +212,7 @@ That's the whole runtime — memory, tool routing, governance, wallet limits, an
 | 68 | [Calibrated Uncertainty Engine](./68-calibrated-uncertainty-engine/) | One confidence per claim derived from evidence, bent toward the agent's measured hit rate via a learned calibration map and Brier scoring, then turned into act / escalate / abstain against a per-risk floor. |
 | 72 | [Counterfactual Simulation](./72-counterfactual-simulation/) | The agent dry-runs a multi-step plan on a clone of its world model — proving a good plan safe, catching a bad plan's first failure, exposing an irreversible step's strand risk, and repairing an incomplete plan — before acting. |
 | 81 | [Conviction → Policy Engine Enforcement Loop](./81-conviction-policy-enforcement/) | Unifies constitutional alignment, authority bands, and polyphonic dissent into a single feedback arc: conviction snapshot → policy pre-flight → band gate → dissent reviewer → conviction update. |
+| 110 | [Agent Objective Topology and Process Management](./110-agent-objective-topology/) | Treats a long-running agent job as an OS-style process with a stateful execution stack, and structures multi-turn goals as a milestone topology injected into context — a dependency-aware alternative to a flat todo list that also knows how to resume where it left off. |
 
 ### Autonomous self-operation and capability evolution
 
@@ -223,6 +227,7 @@ That's the whole runtime — memory, tool routing, governance, wallet limits, an
 | 77 | [Polyphonic Cognition](./77-polyphonic-cognition/) | Many of one agent's cognitive organs run concurrently on a turn and are arbitrated into one verdict — a hard veto dominates a confident majority, a split panel escalates instead of acting, and faulty organs are isolated. |
 | 78 | [Embodied Self-Modification](./78-embodied-self-modification/) | The perceive→act→learn→rewrite loop: online learning from rewards, compiling learned habits into policy verified on a clone before it lands, and a frozen constitution the agent can never self-modify. |
 | 84 | [Self-Audit Dissent Loop](./84-self-audit-dissent-loop/) | A closed feedback cycle that turns PolicyEngine `warn` verdicts into durable self-audit lessons stored in the agent's reflective memory, so a policy brush-up on turn N changes behavior on turn N+1 instead of repeating silently. |
+| 105 | [Parallel Mind Background Physics Engine](./105-parallel-mind-background-physics/) | Governs a bounded pool of concurrent background tasks with an entropy-load metric (more/higher-priority tasks raise cognitive load) and a decaying thread-return-pressure signal, so the agent knows both how saturated its background capacity is and how urgently a finished thread needs to be surfaced. |
 
 ### Security infrastructure and trust boundaries
 
@@ -237,7 +242,7 @@ That's the whole runtime — memory, tool routing, governance, wallet limits, an
 | 42 | [DNS-Pinned SSRF Guard](./42-dns-pinned-ssrf-guard/) | Resolves a host, validates every A/AAAA record against private/metadata ranges, then connects to the pinned IP with the original SNI/Host — closing the DNS-rebinding window. |
 | 44 | [Incident Response Playbook Engine](./44-incident-playbook-engine/) | Regex detection terms map to ordered response steps tagged auto-executable vs approval-required — a machine-readable runbook an agent can execute. |
 | 45 | [Stateless HMAC Preview-Gate Tokens](./45-hmac-preview-gate/) | An HMAC over the gate password issued to the client; rotating the password invalidates every token with no session store, verified in constant time. |
-| 80 | [Web Component Plugin Sandbox](./80-web-component-plugin-sandbox/) | Shadow DOM (closed mode) + Trusted Types policy + CSP nonce injection isolates marketplace plugins without a full iframe browsing context, preserving the Kylum event bus as a first-class surface. |
+| 80 | [Web Component Plugin Sandbox](./80-web-component-plugin-sandbox/) | Shadow DOM (closed mode) + Trusted Types policy + CSP nonce injection isolates marketplace plugins without a full iframe browsing context, preserving the plugin event bus as a first-class surface. |
 
 ### Transport, streaming, and real-time protocols
 
@@ -250,6 +255,7 @@ That's the whole runtime — memory, tool routing, governance, wallet limits, an
 | 62 | [Proof-of-Bandwidth Relay Accounting](./62-proof-of-bandwidth-relay/) | Credits relayed bytes only for valid payloads actually forwarded to a peer over a sliding window, with single-use tickets upgrading sessions without bearer tokens in URLs. |
 | 65 | [In-Stream Sub-Channel Multiplexer](./65-stream-submultiplexer/) | Several logical sub-channels inside one stream with per-channel token buckets so small control frames are never starved by large data frames. |
 | 83 | [Batch Card SSE + turn_end Protocol](./83-batch-card-sse/) | A structured two-part SSE protocol — server-side `turn_end` marker (clean path only) + client-side `createCardDispatcher()` factory — giving consumers a reliable "all cards flushed" signal distinct from stream abort. |
+| 106 | [Channel-Capacity-Aware Session State Sync](./106-channel-capacity-session-sync/) | A Shannon-Hartley-derived tokens/sec capacity estimate per backend tier (cloud/local/client), tracked with an EMA for bandwidth and propagation delay, plus a saturation-aware coherence check that flags when a session has gone silent long enough for its live state to be stale. |
 
 ### App ecosystem, marketplace, and messaging
 
@@ -297,6 +303,9 @@ Instrumentation and control-loop patterns for a system that reasons under uncert
 | 99 | [Implicit Preference Distillation from Binary Feedback](./99-implicit-preference-distillation/) | Turns thumbs up/down ratings into durable per-dimension style weights via a bank of cheap heuristic detectors (structural + tonal) multiplied by rating sign and folded into per-(identity, signal) EMA weights, plus a separate contrastive training-pair queue with explicit pending/training/done status for a downstream fine-tuning job. |
 | 100 | [Automatic Post-Turn Self-Audit and Style-Drift Correction](./100-post-turn-self-audit/) | A background, best-effort reviewer that classifies each turn into a small set of interaction modes, runs mode-scoped audit checks (verbosity, under-explanation, jargon density, affect hedging), maps flags to actionable adjustment text, and folds small style deltas into a slow-moving preference profile — strictly after the user-visible response has already been sent. |
 | 101 | [Continuous Regression Benchmarking with Automatic Regression Detection](./101-continuous-regression-benchmarking/) | A small pluggable benchmark suite (category-tagged cases, per-category scorer strategies) that diffs each case's pass/fail against the immediately preceding run and specifically flags true regressions — cases that used to pass and no longer do — distinct from chronic failures, with incremental crash-safe result writes. |
+| 102 | [Multi-Node Limbic G-Ring (Kuramoto Oscillator)](./102-limbic-g-ring-kuramoto/) | A 5-node Kuramoto-style phase-coupling network computes a synchrony order parameter (R_t) as an arousal/emergence signal, with a fast/slow valence blend so a sudden high-salience stimulus can spike the fast path without waiting for the whole ring to phase-lock. |
+| 104 | [Bekenstein-Bound Entropy Gating for Context Admission](./104-bekenstein-entropy-gating/) | Computes a cognitive entropy ceiling from context size and reasoning depth and uses it as an admission-control gate — new information is rejected once it would exceed the bound, tool calls that add real depth expand the bound, and a holographic-completeness check flags when the invariant set can't fully represent current entropy. |
+| 108 | [THB Closed-Loop Calibration with Synthetic Warmup](./108-thb-closed-loop-calibration/) | Self-tuning constants that update from live turn outcomes via a bounded EMA step, protected by a bootstrap gate so calibration can't run on too little data — seeded at boot by a synthetic warmup pass under a namespaced "phantom" identity so synthetic data never mixes with real user history. |
 
 ## License
 

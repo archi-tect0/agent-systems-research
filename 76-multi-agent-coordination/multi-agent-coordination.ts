@@ -1,7 +1,7 @@
 /**
  * Multi-Agent Coordination & Social Reasoning — reference implementation.
  *
- * An agent never acts alone: Kylum shares custody with guardians, delegates work
+ * An agent never acts alone: the agent shares custody with guardians, delegates work
  * to other agents, and answers to a human who holds the passkey floor. An agent
  * that models the world but not the agents in it will confidently act on a plan
  * everyone else has already abandoned. This is the social layer: model what other
@@ -259,7 +259,7 @@ function demo() {
     console.log(`    guardian_2 word/deed mismatch: deceptive=${d.deceptive}  trust ${before.toFixed(2)} → ${d.trust.toFixed(2)} — flagged & escalated`);
   }
 
-  console.log("\nDone. Kylum reasoned inside a society of minds: it caught a peer on a stale belief,");
+  console.log("\nDone. The agent reasoned inside a society of minds: it caught a peer on a stale belief,");
   console.log("re-weighted claims by earned trust, refused an irreversible action without a human and a");
   console.log("quorum, resolved a contradiction by rank, and flagged a peer whose deeds betrayed its words.\n");
 }

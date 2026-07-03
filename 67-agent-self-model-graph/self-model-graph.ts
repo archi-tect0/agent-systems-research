@@ -236,10 +236,10 @@ function isFailing(h: Health): boolean {
 }
 
 // ─────────────────────────────────────────────────────────────────────────
-// A self-model of a Kylum-shaped agent, used by the demo.
+// A self-model of an example agent, used by the demo.
 // ─────────────────────────────────────────────────────────────────────────
 
-function buildKylumSelfModel(): SelfModelGraph {
+function buildDemoSelfModel(): SelfModelGraph {
   const g = new SelfModelGraph();
   // Subsystems
   g.addNode("router", "subsystem", "LLM router / fallback chain");
@@ -285,13 +285,13 @@ function banner(t: string) {
 function demo() {
   banner("Scenario 1 — healthy self-model: structure + rollup");
   {
-    const g = buildKylumSelfModel();
+    const g = buildDemoSelfModel();
     console.log(g.summarize());
   }
 
   banner("Scenario 2 — embedder down → localize fault, then blast radius");
   {
-    const g = buildKylumSelfModel();
+    const g = buildDemoSelfModel();
     // Symptom the user reports: recall_memory keeps failing.
     g.setHealth("recall_memory", "down", "recall returns 0 hits");
     // Introspection found the real failing dependency:
@@ -310,7 +310,7 @@ function demo() {
 
   banner("Scenario 3 — symptom vs root cause: play_audio fails, endpoint is the cause");
   {
-    const g = buildKylumSelfModel();
+    const g = buildDemoSelfModel();
     g.setHealth("play_audio", "degraded", "audio card never reaches PLAYING");
     g.setHealth("audio_endpoint", "down", "owner-blocked embed / dead fallback");
     const { rootCause } = g.localizeFault("play_audio");
@@ -320,7 +320,7 @@ function demo() {
 
   banner("Scenario 4 — effective-health rollup: a green subsystem reads degraded");
   {
-    const g = buildKylumSelfModel();
+    const g = buildDemoSelfModel();
     g.setHealth("cloud_model", "degraded", "provider 401 / rate-limited");
     // agent_bridge itself is 'ok' but depends (via router) on the degraded model.
     console.log(`  agent_bridge declared health : ${g.get("agent_bridge").health}`);
@@ -331,7 +331,7 @@ function demo() {
 
   banner("Scenario 5 — structural guards: no dangling edges, no cycles");
   {
-    const g = buildKylumSelfModel();
+    const g = buildDemoSelfModel();
     try { g.addDependency("router", "does_not_exist"); }
     catch (e) { console.log("  rejected dangling edge:  " + (e as Error).message); }
     try { g.addDependency("cloud_model", "answer"); } // would close a loop
@@ -347,5 +347,5 @@ if (process.argv.includes("--demo")) {
   demo();
 }
 
-export { SelfModelGraph, buildKylumSelfModel };
+export { SelfModelGraph, buildDemoSelfModel };
 export type { SelfNode, DependsEdge, NodeKind, Health };

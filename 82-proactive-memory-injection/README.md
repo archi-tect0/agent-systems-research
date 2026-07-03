@@ -9,7 +9,7 @@
 
 ## Problem
 
-Kylum's memory subsystem (pgvector + `agentMemoriesV2` table) is episodic and queryable, but the default access path is reactive: the agent must spend a tool-call round-trip calling `recall_memory` before it can reference stored facts.
+the agent's memory subsystem (pgvector + `agentMemoriesV2` table) is episodic and queryable, but the default access path is reactive: the agent must spend a tool-call round-trip calling `recall_memory` before it can reference stored facts.
 
 This creates two failure modes on sovereign-AI workloads:
 

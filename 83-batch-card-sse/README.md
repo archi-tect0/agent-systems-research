@@ -9,7 +9,7 @@
 
 ## Problem
 
-A Kylum agent turn produces heterogeneous output: text deltas, named tool result cards (`nav`, `stat`, `article`, `confirm`, …), ghost cards (pending tool selection), and lifecycle signals (`turn_end`, `done`). Without a shared protocol, SSE consumers must:
+An agent turn produces heterogeneous output: text deltas, named tool result cards (`nav`, `stat`, `article`, `confirm`, …), ghost cards (pending tool selection), and lifecycle signals (`turn_end`, `done`). Without a shared protocol, SSE consumers must:
 
 1. Write fragile ad-hoc `if ("cards" in ev) …` branches inline in the message handler.
 2. Guess when a turn is fully complete — `done` signals stream close, but does it mean "all cards rendered" or "stream aborted"?

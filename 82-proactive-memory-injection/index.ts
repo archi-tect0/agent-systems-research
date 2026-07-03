@@ -103,7 +103,7 @@ function buildSystemPromptWithRecall(
     `System prompt for wallet ${wallet}`,
     ragWithRecall ? `\n--- Context ---\n${ragWithRecall}` : "",
     `\n--- Instructions ---`,
-    `You are Kylum. Respond helpfully.`,
+    `You are the assistant. Respond helpfully.`,
   ];
   return lines.filter(Boolean).join("\n");
 }
@@ -191,11 +191,11 @@ if (process.argv.includes("--demo")) {
   const promptE = buildSystemPromptWithRecall(
     WALLET,
     "What time should I set the alarm for ETH price alerts?",
-    "RAG: Kylum supports custom alerts via the scheduler.",
+    "RAG: the assistant supports custom alerts via the scheduler.",
     false,
     false,
   );
-  const hasRag = promptE.includes("RAG: Kylum supports");
+  const hasRag = promptE.includes("RAG: the assistant supports");
   const hasRecalledE = promptE.includes("RECALLED FROM LONG-TERM MEMORY");
   console.log("[E] Turn with existing RAG knowledge:");
   console.log(`    RAG preserved: ${hasRag}`);

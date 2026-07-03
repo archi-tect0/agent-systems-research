@@ -53,7 +53,7 @@ What you actually want sits between them, and it is the ten facets working toget
 
 **The world is modelled as named subsystems.** (Facet 5.) `Workspace` is not an opaque blob — it is `{ model, tools, build }`. A fault therefore localises: a failing `typecheck` probe is a `build` fault, a 404-ing tool is a `tools` fault. This is what lets diagnosis produce a stable *signature* (`tool:endpoint`, `model:replies`, `build:typecheck`) that memory and cooldowns key on. This minimal three-field model is enough for the loop; the richer, typed dependency graph it generalises to — with failure localisation *through* healthy-looking intermediates and blast-radius queries — is its own guide ([guide 67, Agent Self-Model Graph](../67-agent-self-model-graph/)). Read 67 for the formal self-model schema; this loop is what *acts on* it.
 
-**The branch is the sandbox.** (Facet 7.) Every code fix is applied to a structural clone of the workspace on a `kylum/*` branch. If the fix fails verification, the clone is discarded — a genuine rollback, because the live workspace was never touched. This is the load-bearing safety property: the worst case of a wrong diagnosis is a discarded branch, not a broken production tree. Opening a branch whose name is not under the `kylum/` prefix throws — there is no code path that writes to `main` directly.
+**The branch is the sandbox.** (Facet 7.) Every code fix is applied to a structural clone of the workspace on a `agent/*` branch. If the fix fails verification, the clone is discarded — a genuine rollback, because the live workspace was never touched. This is the load-bearing safety property: the worst case of a wrong diagnosis is a discarded branch, not a broken production tree. Opening a branch whose name is not under the `agent/` prefix throws — there is no code path that writes to `main` directly.
 
 **Diagnosis carries a confidence number, and there is a floor.** (Facet 3.) A fault hypothesis is `{ kind, confidence, evidence, signature }`. Below `CONFIDENCE_FLOOR` (0.55 here) the loop **reports and stops** rather than acting — a single elevated-latency reading is plausibly a network blip, and thrashing the model chain on a blip is worse than waiting. Strong, deterministic faults (a broken typecheck) score high because their fix has a deterministic proof; weak, ambiguous faults score low on purpose. The single hard floor here is the minimal version; making that number *calibrated* (anchored to the agent's measured hit rate) and the floor *risk-scaled* is [guide 68, Calibrated Uncertainty Engine](../68-calibrated-uncertainty-engine/) — drop its `decide()` in where this loop compares `confidence` to `CONFIDENCE_FLOOR` and the report/act split becomes abstain/escalate/act.
 
@@ -72,7 +72,7 @@ This is the difference between an agent that learns and one that re-solves the s
 
 **Landing is human-gated, with no passkey.** (Facet 7.) The final step of a code fix is a one-tap merge card, not an automatic `git merge`. The branch wall plus the audit trail are the safety net, so a passkey ceremony would be friction without a matching threat — but a human still has to approve. Diagnosis, the fix, and the memory are autonomous; the change reaching `main` is a deliberate human act.
 
-**Every step is audited under a fixed identity.** Commits are authored by a fixed `Kylum (engineering mode)` identity so a self-authored change is never mistaken for a human one, and the full introspect→diagnose→plan→verify→merge trail is recorded. Self-repair you cannot reconstruct after the fact is not self-repair; it is an unlogged actor with write access.
+**Every step is audited under a fixed identity.** Commits are authored by a fixed `Agent (engineering mode)` identity so a self-authored change is never mistaken for a human one, and the full introspect→diagnose→plan→verify→merge trail is recorded. Self-repair you cannot reconstruct after the fact is not self-repair; it is an unlogged actor with write access.
 
 ## Algorithm
 
@@ -97,7 +97,7 @@ repair(symptom):
 
     # 4. SELECT + 7. APPLY ON A BRANCH (never on main)
     remediation = REMEDIATIONS[fault.kind] or return ESCALATED
-    branch = clone(workspace) on "kylum/fix-<kind>"   # prefix enforced
+    branch = clone(workspace) on "agent/fix-<kind>"   # prefix enforced
     changed = remediation.apply(branch, fault)
     if not changed: return ESCALATED
 
@@ -107,7 +107,7 @@ repair(symptom):
       discard branch (rollback); continue          # try again or exhaust rounds
 
     # 7. COMMIT + PROPOSE MERGE — human one-tap lands it
-    commit(branch, author=KYLUM_ENGINEERING)
+    commit(branch, author=AGENT_ENGINEERING)
     memory.record(signature, outcome=verified, at=now)   # 8+9
     return MERGE_PROPOSED(branch, diff)
 
@@ -151,9 +151,9 @@ The reference file isolates the *control loop*. In the live agent the same shape
 | Subsystem health model (5) | per-backend `HealthGuard` state, tool error telemetry, the typecheck/build gate — each a distinct, separately-probeable subsystem |
 | Diagnose (3) | a disposable, time-boxed `regression_analyst` worker (Band 0/1, read-only) that reads logs + diffs and returns `{ confidence, conflict_flags, recommendation }` — it cannot write |
 | Request the model (6) | the resilient router's fallback chain ([guide 12](../12-resilient-llm-routing/)) and per-role sub-model selection (thinking vs. tooling models) |
-| Apply on a branch (4, 7) | `git_branch` (`^kylum/[a-z0-9._-]+$` only — the *sole* way to make the tree write-eligible), `write_file`, `exec` (allow-listed `pnpm`/`tsc`/`git`/`node`/`psql`; `rm`/`sudo`/`curl`/subshells blocked) |
+| Apply on a branch (4, 7) | `git_branch` (`^agent/[a-z0-9._-]+$` only — the *sole* way to make the tree write-eligible), `write_file`, `exec` (allow-listed `pnpm`/`tsc`/`git`/`node`/`psql`; `rm`/`sudo`/`curl`/subshells blocked) |
 | Verify (4) | `run_tests` / `exec pnpm typecheck` before any commit |
-| Commit (7) | `git_commit`, fixed author `Kylum (engineering mode)`, **fails on `main`**, requires `engineering_write` |
+| Commit (7) | `git_commit`, fixed author `Agent (engineering mode)`, **fails on `main`**, requires `engineering_write` |
 | Restore (7) | `propose_merge` → one-tap merge card → server-side `git merge --no-ff` on the human's approval |
 | Memory-driven adaptation (8) | the correction-memory / fact store (`writeFact`) and the self-learning vocabulary — verified fixes and behaviour corrections persist across turns and restarts |
 | Temporal awareness (9) | the agent scheduler + worker TTLs + rolling health windows; rate-limiting self-repair per fault signature so a non-holding fix escalates instead of looping |
@@ -174,7 +174,7 @@ RepairShard (production superset of MemoEntry)
   lastAt:       number         # ms epoch — recency drives the flapping guard (stored)
   attempts:     number         # (stored)
   verifiedBy:   string | null  # production add: the probe id whose re-run proved it
-  branch:       string | null  # production add: the kylum/* branch the fix landed from
+  branch:       string | null  # production add: the agent/* branch the fix landed from
   author:       fixed agent id # production add: never a human — the merge is the human act
 ```
 
@@ -196,7 +196,7 @@ A coarse `signature` conflates distinct incidents (see Limitations); widen it (t
 | Introspect (probes) | agent, autonomous | read grant (`engineering_read`) | no — pure reads |
 | Diagnose (hypothesis + confidence) | agent, autonomous | none (in-memory) | no |
 | Recall / flapping check | agent, autonomous | repair-shard memory | no |
-| Apply remedy on a branch | agent, autonomous | write grant (`engineering_write`) + `kylum/*` prefix | no — clone only |
+| Apply remedy on a branch | agent, autonomous | write grant (`engineering_write`) + `agent/*` prefix | no — clone only |
 | Verify (re-run proving probe) | agent, autonomous | read grant | no — branch only |
 | Commit on branch | agent, autonomous | write grant, fixed author, **throws on `main`** | no |
 | Propose merge | agent, autonomous | emits a one-tap card | no |

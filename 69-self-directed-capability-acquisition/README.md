@@ -22,7 +22,7 @@ What you want sits between them: the agent **can** acquire a new capability, but
 
 **A capability gap is earned by recurrence, not asserted once.** A single unmet intent is noise — a one-off request that should never become permanent surface area. The `GapDetector` requires the *same* intent to recur a threshold number of times before acquisition is even attempted. This keeps the tool registry from ballooning with one-shot tools and ensures the agent only spends effort on capabilities the user actually keeps needing.
 
-**Synthesis happens on a clone of the registry — the branch.** Exactly as guide 66 applies code fixes to a throwaway `kylum/*` branch, acquisition writes the candidate tool to a `clone()` of the capability registry, never the live one. A candidate that fails verification is discarded by simply throwing the clone away — a genuine rollback, because the live registry was never mutated. The worst case of a bad synthesis is a discarded branch, not a live tool.
+**Synthesis happens on a clone of the registry — the branch.** Exactly as guide 66 applies code fixes to a throwaway `agent/*` branch, acquisition writes the candidate tool to a `clone()` of the capability registry, never the live one. A candidate that fails verification is discarded by simply throwing the clone away — a genuine rollback, because the live registry was never mutated. The worst case of a bad synthesis is a discarded branch, not a live tool.
 
 **The tool must pass generated tests before it can be proposed.** A capability that "exists" is worthless; a capability that *provably does the thing* is the bar. The agent generates test cases from the intent and the candidate must pass **all** of them. The demo deliberately includes a buggy candidate (returns a fraction instead of a percent) that fails its own suite and is discarded before a correct candidate lands — proving verification is load-bearing, not decorative.
 
@@ -84,7 +84,7 @@ The demo exercises five scenarios:
 | Acquisition step | Production mechanism |
 |------------------|----------------------|
 | gap detection by recurrence | unmet-intent telemetry (the same signal that feeds [guide 09](../09-intent-based-tool-selection/)'s intent drawers and correction memory) |
-| synthesis on a clone | `git_branch` (`^kylum/[a-z0-9._-]+$` only) + `write_file` on a throwaway branch, exactly as in [guide 66](../66-metacognitive-self-repair/) |
+| synthesis on a clone | `git_branch` (`^agent/[a-z0-9._-]+$` only) + `write_file` on a throwaway branch, exactly as in [guide 66](../66-metacognitive-self-repair/) |
 | generated verification | `run_tests` / `exec pnpm typecheck` against the branch before any proposal |
 | `proposed` status + dispatcher refusal | the tool registry's lifecycle state; the dispatcher only exposes `active` tools |
 | human approval + band assignment | the one-tap merge card ([guide 49](../49-batched-approval-ceremony/)) plus authority-band assignment ([guide 37](../37-agent-authority-bands/)) |

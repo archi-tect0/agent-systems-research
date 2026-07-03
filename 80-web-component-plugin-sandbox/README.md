@@ -5,13 +5,13 @@
 
 ## Problem
 
-Kylum's marketplace allows third-party plugins to render UI panels within the agent surface. Naive embedding (iframe, unsandboxed eval, direct DOM injection) creates three attack vectors:
+the agent's marketplace allows third-party plugins to render UI panels within the agent surface. Naive embedding (iframe, unsandboxed eval, direct DOM injection) creates three attack vectors:
 
 1. **DOM clobbering / prototype pollution** — a plugin that writes to `window.name` or `Object.prototype` can hijack the host shell.
 2. **Credential leakage** — a plugin with access to `document.cookie` or `sessionStorage` can exfiltrate session tokens.
 3. **Style contamination** — a plugin's CSS bleeds into the host, breaking the glassmorphic 2085 theme and potentially phishing by overlaying wallet-unlock prompts.
 
-The established solution (opaque iframes with `sandbox` attribute) is correct but too blunt: it breaks `postMessage` patterns, prevents the Kylum event bus from being a first-class surface inside plugins, and incurs a full browsing context per plugin (costly on low-end devices).
+The established solution (opaque iframes with `sandbox` attribute) is correct but too blunt: it breaks `postMessage` patterns, prevents the plugin event bus from being a first-class surface inside plugins, and incurs a full browsing context per plugin (costly on low-end devices).
 
 ---
 
@@ -21,13 +21,13 @@ The established solution (opaque iframes with `sandbox` attribute) is correct bu
 
 ### Layer 1 — Custom Element host
 
-Each plugin is registered as a Custom Element (`class KylumPlugin extends HTMLElement`). The element's constructor attaches a **closed** Shadow DOM root (`attachShadow({ mode: "closed" })`). The plugin receives no reference to the shadow root directly — all interaction goes through a narrow DOM API wrapper injected into the constructor scope.
+Each plugin is registered as a Custom Element (`class PluginElement extends HTMLElement`). The element's constructor attaches a **closed** Shadow DOM root (`attachShadow({ mode: "closed" })`). The plugin receives no reference to the shadow root directly — all interaction goes through a narrow DOM API wrapper injected into the constructor scope.
 
 Closed Shadow DOM means `document.querySelector`, `element.shadowRoot`, and extension scripts cannot traverse into the plugin tree.
 
 ### Layer 2 — Trusted Types policy
 
-A per-plugin `TrustedTypePolicy` is created with `trustedTypes.createPolicy("kylum-plugin-<id>", { createHTML: sanitize })`. The `sanitize` function is a strict allowlist (DOMPurify-based) that strips `<script>`, inline event handlers, `data:` URIs, and JavaScript protocol links.
+A per-plugin `TrustedTypePolicy` is created with `trustedTypes.createPolicy("plugin-<id>", { createHTML: sanitize })`. The `sanitize` function is a strict allowlist (DOMPurify-based) that strips `<script>`, inline event handlers, `data:` URIs, and JavaScript protocol links.
 
 The host's CSP includes `require-trusted-types-for 'script'`, so any plugin that attempts to set `innerHTML` directly (bypassing the policy) is blocked at the browser level.
 
@@ -35,13 +35,13 @@ The host's CSP includes `require-trusted-types-for 'script'`, so any plugin that
 
 The host injects one `CSSStyleSheet` per plugin using `shadowRoot.adoptedStyleSheets`. The stylesheet is locked: `Object.freeze(sheet.cssRules)` prevents runtime mutation. The `:host` selector is scoped so `:root` variables from the plugin cannot affect the parent document.
 
-### Layer 4 — Kylum event bus bridge (postMessage protocol)
+### Layer 4 — plugin event bus bridge (postMessage protocol)
 
 Instead of direct DOM access, plugins communicate through a typed message bus:
 
 ```
-Plugin → shadowRoot dispatch → PluginHost bridge → KylumEventBus
-KylumEventBus → PluginHost bridge → CustomEvent → shadowRoot
+Plugin → shadowRoot dispatch → PluginHost bridge → PluginEventBus
+PluginEventBus → PluginHost bridge → CustomEvent → shadowRoot
 ```
 
 The bridge enforces an origin check (`event.source === pluginWindow`) and a schema-validated message envelope (`{ kind: string, payload: unknown }`). Plugins receive only events they registered for — no global event sniffing.
@@ -81,13 +81,13 @@ Shadow DOM does **not** isolate JavaScript execution context. A plugin registere
 | Credential leakage (`document.cookie`, `sessionStorage`) | ❌ Not blocked — same JS realm | ✅ Blocked — cross-origin boundary |
 | Prototype pollution | ⚠️ Partial (Trusted Types helps) | ✅ Blocked |
 
-**Practical recommendation:** Use the Shadow DOM + Trusted Types approach for Kylum's own first-party extension panels. For untrusted marketplace plugins, gate on a lightweight iframe wrapper with `sandbox="allow-scripts allow-same-origin"` plus a postMessage event bus that mirrors the bridge protocol in Layer 4 above.
+**Practical recommendation:** Use the Shadow DOM + Trusted Types approach for the agent's own first-party extension panels. For untrusted marketplace plugins, gate on a lightweight iframe wrapper with `sandbox="allow-scripts allow-same-origin"` plus a postMessage event bus that mirrors the bridge protocol in Layer 4 above.
 
 ---
 
 ## Novel contribution
 
-Prior Kylum guides addressed the server-side plugin host (MCP) and marketplace trust (guide 38). This guide is the first to define the **client-side rendering sandbox** for Kylum's own first-party extension panels — providing strong style isolation and DOM traversal isolation without the full cost of a separate browsing context.
+Prior guides addressed the server-side plugin host (MCP) and marketplace trust (guide 38). This guide is the first to define the **client-side rendering sandbox** for the agent's own first-party extension panels — providing strong style isolation and DOM traversal isolation without the full cost of a separate browsing context.
 
 **Trade-off vs. sandboxed iframe:** the Shadow DOM approach is lighter (no separate browsing context, no postMessage serialisation overhead) but provides *weaker* credential isolation than an `<iframe sandbox>` boundary. A sandboxed cross-origin iframe is a hard JS-realm boundary; Shadow DOM is not. The correct choice by trust level is documented in the security caveat above: Shadow DOM for reviewed first-party panels, iframe sandbox for untrusted third-party plugins.
 
@@ -96,7 +96,7 @@ Prior Kylum guides addressed the server-side plugin host (MCP) and marketplace t
 ## Integration points
 
 - `artifacts/vanguard/src/lib/pluginSandbox.ts` — `PluginSandbox` class
-- `artifacts/vanguard/src/lib/pluginBridge.ts` — Kylum event bus bridge
+- `artifacts/vanguard/src/lib/pluginBridge.ts` — plugin event bus bridge
 - `artifacts/api-server/src/routes/marketplace.ts` — plugin manifest validation
 - CSP headers: `artifacts/api-server/src/app.ts` (Helmet configuration)
 

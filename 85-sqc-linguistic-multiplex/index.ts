@@ -363,7 +363,7 @@ Turn 5 — Agent:  reading from the encrypted cache to seed the audit.
 Turn 6 — User: Show me the server reply from the last API call.
 Turn 6 — Agent:  here is the result from the latest endpoint call:
                the server response contained a 200 status and valid JSON.
-               called the external endpoint [SQC:PASS]https://api.kylum.os/v2/vault/status[/SQC:PASS]
+               called the external endpoint [SQC:PASS]https://api.example.os/v2/vault/status[/SQC:PASS]
                I received the following reply: {"status":"ok","epoch":9142}
 `.trim();
 
@@ -435,7 +435,7 @@ Turn 6 — Agent:  here is the result from the latest endpoint call:
   const PASS_BALANCE  = "4.2180 ETH";
   const PASS_FEE      = "0.0023 ETH";
   const PASS_TX_HASH  = "0xdeadbeef1234abcd5678";
-  const PASS_URL      = "https://api.kylum.os/v2/vault/status";
+  const PASS_URL      = "https://api.example.os/v2/vault/status";
 
   const passIntact = (
     body.includes(PASS_ADDRESS) &&

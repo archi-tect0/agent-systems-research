@@ -328,7 +328,7 @@ async function demo(): Promise<void> {
   console.log("C. Compressing 6-turn episodic history…");
   advance(250);
 
-  // Realistic Kylum assistant turns — each contains sentences matching the
+  // Realistic assistant turns — each contains sentences matching the
   // template catalogue above. Wallet addresses and hashes are real-format.
   // Corpus uses the same em-dash join style as the templates so sentences
   // are not split mid-pattern by the sentence boundary detector.

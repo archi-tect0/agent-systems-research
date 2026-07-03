@@ -138,8 +138,8 @@ type Remediation = {
 
 const CONFIDENCE_FLOOR = 0.55; // below this, do not touch the branch — report.
 const MAX_REMEDIATION_ROUNDS = 3; // bound the self-repair loop; no infinite churn.
-const COMMIT_AUTHOR = "Kylum (engineering mode) <kylum@dbk.local>";
-const BRANCH_PREFIX = "kylum/"; // writes are ONLY ever valid on this namespace.
+const COMMIT_AUTHOR = "Agent (engineering mode) <agent@dbk.local>";
+const BRANCH_PREFIX = "agent/"; // writes are ONLY ever valid on this namespace.
 const FLAP_COOLDOWN_MS = 10 * 60 * 1000; // (9) a fault re-fixed within this window is "flapping".
 
 // ─────────────────────────────────────────────────────────────────────────
@@ -404,7 +404,7 @@ class SelfRepairLoop {
   /**
    * (7) Open a "branch": a structural clone of the workspace. All code writes
    * happen here. If we never propose a merge, this clone is simply discarded —
-   * the real workspace is untouched. In-memory analogue of the `kylum/*`
+   * the real workspace is untouched. In-memory analogue of the `agent/*`
    * branch wall.
    */
   private openBranch(name: string): Workspace {
@@ -588,14 +588,14 @@ function renderDiff(before: Workspace, after: Workspace): string {
 function healthyWorkspace(): Workspace {
   return {
     model: {
-      active: "kylum-os:latest",
-      chain: ["kylum-os:latest", "groq:llama-3.3-70b", "cerebras:llama-3.3-70b", "gemini-2.5-flash"],
+      active: "agent-os:latest",
+      chain: ["agent-os:latest", "groq:llama-3.3-70b", "cerebras:llama-3.3-70b", "gemini-2.5-flash"],
       emptyReplyRate: 0.02,
       p95LatencyMs: 1400,
     },
     tools: [
       { name: "web_search", endpoint: "https://api.search.v2/run", knownGoodEndpoint: "https://api.search.v2/run", errorRate: 0.01 },
-      { name: "play_audio", endpoint: "https://media.kylum/play", knownGoodEndpoint: "https://media.kylum/v3/play", errorRate: 0.0 },
+      { name: "play_audio", endpoint: "https://media.example/play", knownGoodEndpoint: "https://media.example/v3/play", errorRate: 0.0 },
     ],
     build: { typechecks: true, firstError: null },
   };
@@ -706,7 +706,7 @@ function demo(): void {
     printOutcome(new SelfRepairLoop(healthyWorkspace()).run("User: 'are you okay?'"));
   }
 
-  console.log("\nDone. Every code fix was applied on a kylum/* branch and gated behind a");
+  console.log("\nDone. Every code fix was applied on a agent/* branch and gated behind a");
   console.log("human merge; behaviour fixes became durable memories; recurring faults were");
   console.log("recalled, and a fix that did not hold was escalated, not retried forever.\n");
 }

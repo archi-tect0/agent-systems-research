@@ -24,7 +24,7 @@ const FRICTION_THRESHOLD  = 0.50;  // C_r ≤ this → FRICTION state (curriculu
 const FLATLINE_THRESHOLD  = 0.80;  // C_r ≥ this → FLAT-LINE state (familiar territory)
 const MIN_CLUSTER_SIZE    = 4;     // minimum anomalies per cluster to enter bake queue
 const POST_BAKE_CR        = 0.85;  // projected C_r for formerly-friction turns after bake
-const BASE_FINGERPRINT    = "kylum-os:latest";
+const BASE_FINGERPRINT    = "agent-os:latest";
 
 // ── Types ─────────────────────────────────────────────────────────────────────
 

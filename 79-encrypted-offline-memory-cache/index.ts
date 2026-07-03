@@ -60,7 +60,7 @@ interface EncryptedEntry {
 async function deriveKey(sessionToken: string, walletSalt: string): Promise<webcrypto.CryptoKey> {
   const ikm  = Buffer.from(sessionToken, "utf8");
   const salt = Buffer.from(walletSalt,   "utf8");
-  const info = Buffer.from("kylum-offline-memory-v1", "utf8");
+  const info = Buffer.from("agent-offline-memory-v1", "utf8");
 
   const { hkdfSync } = await import("node:crypto");
   const keyBytes = hkdfSync("sha256", ikm, salt, info, 32);

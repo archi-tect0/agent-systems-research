@@ -5,7 +5,7 @@
 
 ## Problem
 
-Kylum's memory subsystem is always-online: every `remember()` call embeds via the OpenAI proxy, every `recall()` call fires a pgvector similarity query. When the network is unavailable, the agent loses all episodic context — it cannot recall preferences, corrections, or facts from the current session.
+the agent's memory subsystem is always-online: every `remember()` call embeds via the OpenAI proxy, every `recall()` call fires a pgvector similarity query. When the network is unavailable, the agent loses all episodic context — it cannot recall preferences, corrections, or facts from the current session.
 
 Two sub-problems make naïve caching dangerous for a sovereign-AI system:
 

@@ -82,7 +82,7 @@ node self-model-graph.ts --demo
 npx tsx self-model-graph.ts --demo
 ```
 
-The demo builds a Kylum-shaped self-model (router / dispatcher / memory / agent-bridge subsystems, cloud-model / embedder / audio-endpoint resources, answer / recall_memory / play_audio capabilities) and exercises five scenarios:
+The demo builds an example self-model (router / dispatcher / memory / agent-bridge subsystems, cloud-model / embedder / audio-endpoint resources, answer / recall_memory / play_audio capabilities) and exercises five scenarios:
 
 1. **Healthy self-model** — structure plus the effective-health rollup, all green.
 2. **Embedder down** — symptom `recall_memory` localizes *through* the green `memory` subsystem to the `embedder` resource; blast radius lists exactly `recall_memory` and proves `answer`/`play_audio` are unaffected.
