@@ -1,0 +1,77 @@
+{
+  "id": "creative-media--full-autonomy--async-background",
+  "domain": {
+    "id": "creative-media",
+    "name": "Creative / Generative Media",
+    "description": "Tools that generate or remix art, music, video, or 3D scenes — the agent's output *is* the product, not just a means to an action.",
+    "examples": [
+      "AI album cover generator",
+      "procedural music composer",
+      "text-to-3D scene builder",
+      "style-transfer video editor"
+    ],
+    "guides": [
+      30,
+      54,
+      61,
+      63,
+      35,
+      5
+    ]
+  },
+  "governance": {
+    "id": "full-autonomy",
+    "name": "Full Autonomy",
+    "description": "The agent acts unsupervised within its declared authority band — no per-action human gate.",
+    "examples": [
+      "background inbox triage",
+      "auto-adjusting thermostat schedule",
+      "self-balancing game difficulty"
+    ],
+    "guides": [
+      37,
+      38,
+      22,
+      70,
+      78,
+      17
+    ]
+  },
+  "latency": {
+    "id": "async-background",
+    "name": "Async / Background (seconds–minutes)",
+    "description": "Work that runs off the interaction thread and reports back — jobs, pipelines, batch tool chains.",
+    "examples": [
+      "nightly portfolio rebalance job",
+      "batch image upscaling queue",
+      "multi-step research report generator"
+    ],
+    "guides": [
+      8,
+      26,
+      55,
+      58,
+      71
+    ]
+  },
+  "recommendedGuides": [
+    5,
+    8,
+    17,
+    22,
+    26,
+    30,
+    35,
+    37,
+    38,
+    54,
+    55,
+    58,
+    61,
+    63,
+    70,
+    71,
+    78
+  ],
+  "pitch": "A creative / generative media governed by full autonomy, operating at async / background (seconds–minutes) latency."
+}

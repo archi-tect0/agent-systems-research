@@ -1,5 +1,8 @@
 # Multi-Chain Shadow Wallet Derivation (HKDF, no BIP-39 seed)
 
+
+*Part of the [research/ index](../README.md) — see [Start Here](../README.md#start-here) for the recommended reading order.*
+
 ## Problem
 
 A user authenticates once — with a passkey, a wallet signature, or any other identity proof — and now wants to hold and move assets across several blockchains with completely different key formats and address encodings:

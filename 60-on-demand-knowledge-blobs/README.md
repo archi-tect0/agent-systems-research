@@ -1,5 +1,8 @@
 # On-Demand Encrypted Knowledge-Blob Injection
 
+
+*Part of the [research/ index](../README.md) — see [Start Here](../README.md#start-here) for the recommended reading order.*
+
 ## Problem
 
 A capable assistant needs to "know" how to operate many apps, tools, and domains. Baking all of that knowledge into one static system prompt is wasteful: the model pays the token cost of every capability on every turn, even capabilities it never uses in that conversation. As the number of supported capabilities grows, the base prompt grows with it, and the per-turn cost grows whether or not any given capability is invoked.

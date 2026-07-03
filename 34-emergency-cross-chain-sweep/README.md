@@ -1,5 +1,8 @@
 # Emergency Cross-Chain Sweep
 
+
+*Part of the [research/ index](../README.md) — see [Start Here](../README.md#start-here) for the recommended reading order.*
+
 ## Problem
 
 A wallet is compromised — a seed phrase phished, a malicious approval signed, a device stolen with keys on it. The user has minutes, sometimes seconds, before an attacker drains everything. Worse, a single deterministic wallet often controls *addresses on many chains at once* (the same key material derives Bitcoin, EVM, Solana, and Tron addresses). The attacker can sweep all of them; so must the defender.

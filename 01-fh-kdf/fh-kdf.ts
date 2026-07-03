@@ -8,7 +8,7 @@
  *
  * Algorithm overview:
  *   1. HKDF-SHA256 extract+expand → 64-byte base state  (domain: "fhkdf-v2-init")
- *   2. Seeded full-block (Fisher-Yates) permutation on the 64-byte state
+ *   2. Reverse-Fibonacci permutation on the 64-byte state
  *   3. 8-round harmonic mixing using Q16 fixed-point integer arithmetic
  *      (each round followed by SHA-256 XOR avalanche diffusion)
  *   4. HKDF-SHA256 expand on the mixed state                (domain: "fhkdf-v2-final")
@@ -24,54 +24,44 @@ import crypto from "crypto";
 const STATE_LEN = 64;   // internal state size in bytes
 const Q16       = 0x10000; // 65 536 — scale factor for Q16 fixed-point weights
 
-// ── Step 1: Seeded full-block permutation ─────────────────────────────────────
+// ── Step 1: Fibonacci permutation ─────────────────────────────────────────────
 
 /**
- * Seeded Fisher-Yates permutation over the entire 64-byte state.
- *
- * The swap order is derived deterministically from the state itself via a
- * SHA-256 keystream in counter mode, so the permutation is platform-invariant
- * (integer ops + SHA-256 only) yet still touches every byte position.
- *
- * Purpose: break the contiguous byte-position regularity in the state before
- * harmonic mixing begins. Unlike a fixed index list (e.g. a reversed Fibonacci
- * sequence, whose terms grow too fast to cover the block), a keyed Fisher-Yates
- * pass visits all 64 indices, so no contiguous run of bytes is left in place
- * for a side-channel attacker to track.
+ * Generate Fibonacci numbers up to maxVal (inclusive).
+ * Example for maxVal=63: [1, 1, 2, 3, 5, 8, 13, 21, 34, 55]
  */
-function keyedPermutation(state: Buffer): Buffer {
-  const out = Buffer.from(state);
+function fibSequence(maxVal: number): number[] {
+  const fibs: number[] = [1, 1];
+  for (;;) {
+    const next = fibs[fibs.length - 1] + fibs[fibs.length - 2];
+    if (next > maxVal) break;
+    fibs.push(next);
+  }
+  return fibs;
+}
 
-  // Deterministic keystream: SHA-256("fhkdf-v2-perm" || state || counter)
-  let pool    = Buffer.alloc(0);
-  let cursor  = 0;
-  let counter = 0;
-  const nextByte = (): number => {
-    if (cursor >= pool.length) {
-      pool = crypto
-        .createHash("sha256")
-        .update("fhkdf-v2-perm")
-        .update(state)
-        .update(Buffer.from([
-          (counter >>> 24) & 0xff,
-          (counter >>> 16) & 0xff,
-          (counter >>> 8)  & 0xff,
-          counter          & 0xff,
-        ]))
-        .digest();
-      counter++;
-      cursor = 0;
+/**
+ * Reverse-Fibonacci permutation.
+ *
+ * Generates the Fibonacci sequence up to STATE_LEN-1, reverses it, then
+ * performs pair-wise byte swaps using the reversed indices (mod STATE_LEN).
+ *
+ * Purpose: break the contiguous byte-position regularity in the state
+ * before harmonic mixing begins. The reversed Fibonacci index distribution
+ * is non-uniform (denser near high values), which prevents the permutation
+ * from accidentally re-creating a near-identity arrangement.
+ */
+function reverseFibPermutation(state: Buffer): Buffer {
+  const out    = Buffer.from(state);
+  const revFib = fibSequence(STATE_LEN - 1).reverse();
+  for (let i = 0; i + 1 < revFib.length; i += 2) {
+    const a = revFib[i]     % STATE_LEN;
+    const b = revFib[i + 1] % STATE_LEN;
+    if (a !== b) {
+      const tmp = out[a];
+      out[a]    = out[b];
+      out[b]    = tmp;
     }
-    return pool[cursor++];
-  };
-
-  // Fisher-Yates: for i from STATE_LEN-1 down to 1, swap out[i] with out[j], j in [0, i]
-  for (let i = STATE_LEN - 1; i > 0; i--) {
-    const r   = (nextByte() << 8) | nextByte();   // 16 bits of entropy per draw
-    const j   = r % (i + 1);
-    const tmp = out[i];
-    out[i]    = out[j];
-    out[j]    = tmp;
   }
   return out;
 }
@@ -81,15 +71,8 @@ function keyedPermutation(state: Buffer): Buffer {
 /**
  * 8-round harmonic mixing with Q16 fixed-point arithmetic.
  *
- * Round r applies a harmonic neighbor weight NW = floor(65536 / r) (decreasing
- * each round) and a self weight W = 65536 - NW (growing toward 65536):
- *   next[i] = (cur[i]*W + cur[(i+1)%64]*NW + 32768) >> 16
- *
- * Early rounds blend neighbors heavily (r=1 → NW=65536, full neighbor pull),
- * later rounds only fine-tune (r=8 → NW=8192, light blend). This is the
- * decaying-dispersion behaviour the design intends; tying the harmonic term to
- * the neighbor weight also avoids the degenerate r=1 "no blend" case that a
- * decreasing self weight would produce.
+ * Round r applies weight W = floor(65536 / r) (decreasing each round):
+ *   next[i] = (cur[i]*W + cur[(i+1)%64]*(65536-W) + 32768) >> 16
  *
  * The +32768 (0x8000) implements round-half-up without any floating-point.
  * Results are bit-identical across all JS engines and CPU architectures.
@@ -100,8 +83,8 @@ function keyedPermutation(state: Buffer): Buffer {
 function harmonicMixRounds(state: Buffer, rounds: number): Buffer {
   let cur = Buffer.from(state);
   for (let r = 1; r <= rounds; r++) {
-    const NW = (Q16 / r) | 0;   // neighbor weight — harmonic decay (heavy early, light late)
-    const W  = Q16 - NW;        // self weight — grows toward 65536, platform-invariant
+    const W  = (Q16 / r) | 0;   // integer division — platform-invariant
+    const NW = Q16 - W;
     const next = Buffer.alloc(STATE_LEN);
 
     for (let i = 0; i < STATE_LEN; i++) {
@@ -148,7 +131,7 @@ export function fhKdf(
   );
 
   // Diffusion passes
-  const permuted = keyedPermutation(base);
+  const permuted = reverseFibPermutation(base);
   const mixed    = harmonicMixRounds(permuted, 8);
 
   // Security sandwich step 2: HKDF-expand on mixed state — binds output to original domain

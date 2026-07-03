@@ -1,0 +1,78 @@
+{
+  "id": "emergent-agent--quorum-consensus--async-background",
+  "domain": {
+    "id": "emergent-agent",
+    "name": "Emergent Multi-Agent / Speculative",
+    "description": "Categories that don't fully exist yet — societies of cooperating or competing agents, agent-run micro-businesses, self-modifying software written by the thing it runs.",
+    "examples": [
+      "agent-run marketplace stall that negotiates its own prices",
+      "swarm of agents co-authoring a living document",
+      "self-patching game NPC economy",
+      "AI guild that hires other AIs for sub-tasks"
+    ],
+    "guides": [
+      28,
+      76,
+      77,
+      78,
+      69,
+      66,
+      67,
+      81,
+      38
+    ]
+  },
+  "governance": {
+    "id": "quorum-consensus",
+    "name": "Quorum / Consensus",
+    "description": "Multiple parties — agents and/or humans — must agree before an action lands.",
+    "examples": [
+      "family shared-vault withdrawal",
+      "guild treasury spend",
+      "multi-agent negotiation settlement"
+    ],
+    "guides": [
+      29,
+      32,
+      76,
+      49
+    ]
+  },
+  "latency": {
+    "id": "async-background",
+    "name": "Async / Background (seconds–minutes)",
+    "description": "Work that runs off the interaction thread and reports back — jobs, pipelines, batch tool chains.",
+    "examples": [
+      "nightly portfolio rebalance job",
+      "batch image upscaling queue",
+      "multi-step research report generator"
+    ],
+    "guides": [
+      8,
+      26,
+      55,
+      58,
+      71
+    ]
+  },
+  "recommendedGuides": [
+    76,
+    8,
+    26,
+    28,
+    29,
+    32,
+    38,
+    49,
+    55,
+    58,
+    66,
+    67,
+    69,
+    71,
+    77,
+    78,
+    81
+  ],
+  "pitch": "A emergent multi-agent / speculative governed by quorum / consensus, operating at async / background (seconds–minutes) latency."
+}

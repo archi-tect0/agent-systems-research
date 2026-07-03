@@ -1,5 +1,8 @@
 # Multi-Turn Deliberation & Multi-Step Planning
 
+
+*Part of the [research/ index](../README.md) — see [Start Here](../README.md#start-here) for the recommended reading order.*
+
 *Carrying one intent across many turns — decomposing it into a plan graph, executing it a subgoal at a time, monitoring the assumptions it rests on, repairing it when one breaks, and escalating or abandoning it when risk spikes or confidence collapses.*
 
 The reflective runtime ([guide 73](../73-reflective-runtime/)) gives you a complete *single-turn* cognitive cycle: route → score → govern → dispatch → remember → reflect. The counterfactual simulator ([guide 72](../72-counterfactual-simulation/)) dry-runs *one* plan on a clone before acting. This guide is the layer above both: it is what lets the agent *think longer than one turn* — pursue a goal over time, adaptively, holding intent steady while the world shifts underneath it.

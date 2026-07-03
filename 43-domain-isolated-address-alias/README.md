@@ -1,5 +1,8 @@
 # Domain-Isolated Deterministic Address Aliases
 
+
+*Part of the [research/ index](../README.md) — see [Start Here](../README.md#start-here) for the recommended reading order.*
+
 ## Problem
 
 A user with a single master seed often needs to present an account address to many independent sites — a shop, a forum, a bank portal, a social app. Reusing one address everywhere is convenient but destroys privacy: any two sites (or any on-chain observer) can correlate the shared address and link the user's activity across contexts.

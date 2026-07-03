@@ -1,5 +1,8 @@
 # Dependency-Aware Parallel Tool Dispatch
 
+
+*Part of the [research/ index](../README.md) — see [Start Here](../README.md#start-here) for the recommended reading order.*
+
 ## Problem
 
 When a language model decides to call several tools in a single turn, the simplest dispatcher runs them one after another. That is correct but slow: if three of the calls are independent — say three separate searches — there is no reason to pay the latency of all three back to back. The total wall-clock time becomes the *sum* of every call's latency when it could be close to the *maximum*.

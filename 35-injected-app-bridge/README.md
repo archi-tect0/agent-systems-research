@@ -1,5 +1,8 @@
 # Injected App Bridge for Single-File Mini-Apps
 
+
+*Part of the [research/ index](../README.md) — see [Start Here](../README.md#start-here) for the recommended reading order.*
+
 ## Problem
 
 We want users to author tiny "mini-apps" — a single HTML file with inline CSS and JavaScript — and run them inside a host application (an OS-like shell, a launcher, an agent surface). These apps should be able to do useful, stateful things: store a value, read it back later, send a notification, react to host state changes. But a single HTML file has no backend, no identity, and no storage of its own.

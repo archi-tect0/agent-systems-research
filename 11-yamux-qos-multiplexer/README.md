@@ -1,5 +1,8 @@
 # QoS-Lane Stream Multiplexer (Yamux)
 
+
+*Part of the [research/ index](../README.md) — see [Start Here](../README.md#start-here) for the recommended reading order.*
+
 ## Problem
 
 A single long-lived connection (a WebSocket, a TCP socket) often has to carry many independent logical conversations at once: an authentication handshake, a bulk blob transfer, a stream of small chat messages, and a periodic keepalive ping. If they all share one byte stream naively, two problems appear:

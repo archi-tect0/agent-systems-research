@@ -1,5 +1,8 @@
 # Multi-Agent Coordination & Social Reasoning
 
+
+*Part of the [research/ index](../README.md) — see [Start Here](../README.md#start-here) for the recommended reading order.*
+
 *Reasoning in a society of minds — modeling what other agents and humans believe, earning and spending trust by outcome, agreeing on a shared plan only when authority and quorum are met, resolving contradictory claims by rank rather than by guess, and catching a peer whose actions betray its words.*
 
 The whole research set so far has built a single agent that reasons about the world ([guide 75](../75-world-model-belief-state/)) and about itself (the Layer-2 set) over time ([guide 74](../74-multi-turn-deliberation/)). But Kylum never acts alone: it shares custody with guardians ([guide 29](../29-quorum-vault-groups/)), delegates work to other agents over the A2A marketplace ([guide 28](../28-a2a-marketplace/)), and answers to a human who holds the passkey floor. This guide is the social layer — what the agent needs to reason *with* and *about* other minds.

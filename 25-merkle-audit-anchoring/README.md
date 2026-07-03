@@ -1,5 +1,8 @@
 # Merkle Audit Anchoring
 
+
+*Part of the [research/ index](../README.md) — see [Start Here](../README.md#start-here) for the recommended reading order.*
+
 ## Problem
 
 A system that takes consequential actions — moving funds, changing permissions, blocking traffic — needs an audit log that is *tamper-evident*. A plain append-only table is not enough: anyone with write access to the database (an admin, a compromised service, a buggy migration) can delete or rewrite a row and leave no trace.

@@ -1,0 +1,77 @@
+{
+  "id": "realtime-game--budgeted-delegation--interactive",
+  "domain": {
+    "id": "realtime-game",
+    "name": "Real-Time Game",
+    "description": "Multiplayer or single-player interactive entertainment where state must sync at sub-frame latency and the agent may be a player, narrator, or opponent.",
+    "examples": [
+      "co-op dungeon crawler with an AI dungeon master",
+      "1v1 card game with a bluffing AI opponent",
+      "shared-world sandbox",
+      "rhythm game with generative levels"
+    ],
+    "guides": [
+      11,
+      27,
+      57,
+      61,
+      63,
+      64,
+      65,
+      83
+    ]
+  },
+  "governance": {
+    "id": "budgeted-delegation",
+    "name": "Budgeted Delegation",
+    "description": "The agent has a spend/action budget and acts freely inside it, escalating only when it would exceed the cap.",
+    "examples": [
+      "daily grocery auto-reorder under a $50 cap",
+      "in-game currency auto-spend on consumables",
+      "ad-spend autopilot with a monthly ceiling"
+    ],
+    "guides": [
+      17,
+      18,
+      70,
+      96
+    ]
+  },
+  "latency": {
+    "id": "interactive",
+    "name": "Interactive (sub-second)",
+    "description": "Conversational, turn-based UI latency — the user waits for one reply, not a stream of frames.",
+    "examples": [
+      "chat assistant",
+      "form-filling copilot",
+      "code review comment bot"
+    ],
+    "guides": [
+      12,
+      9,
+      50,
+      68,
+      40
+    ]
+  },
+  "recommendedGuides": [
+    9,
+    11,
+    12,
+    17,
+    18,
+    27,
+    40,
+    50,
+    57,
+    61,
+    63,
+    64,
+    65,
+    68,
+    70,
+    83,
+    96
+  ],
+  "pitch": "A real-time game governed by budgeted delegation, operating at interactive (sub-second) latency."
+}

@@ -1,5 +1,8 @@
 # DB-Backed Autonomous Agent Scheduler
 
+
+*Part of the [research/ index](../README.md) — see [Start Here](../README.md#start-here) for the recommended reading order.*
+
 ## Problem
 
 An assistant that can only act while the user has a tab open is not autonomous.
@@ -34,11 +37,9 @@ The race that matters is two ticks (from the same process or two instances)
 grabbing the same row and firing it twice. The claim is a single statement:
 
 ```sql
-UPDATE schedules SET status = 'processing', claimed_at = now()
+UPDATE schedules SET status = 'processing'
  WHERE id IN (SELECT id FROM schedules
-               WHERE (status = 'pending' AND fire_at <= now())
-                  OR (status = 'processing'
-                      AND claimed_at < now() - interval '5 minutes')  -- ghost reclaim
+               WHERE status = 'pending' AND fire_at <= now()
                ORDER BY fire_at ASC
                LIMIT :batch
                FOR UPDATE SKIP LOCKED)
@@ -49,17 +50,6 @@ UPDATE schedules SET status = 'processing', claimed_at = now()
 rows already locked by the first and claims different ones. The `RETURNING` set
 is the canonical batch *this* tick owns. No row is ever claimed twice, and the
 two ticks parallelize instead of colliding.
-
-**Why reclaim stale `processing` rows?**
-The claim flips a row to `processing` *before* the work runs. If the worker
-crashes (or is killed mid-deploy) after the claim but before re-arming the row,
-that row is stranded in `processing` forever — a *ghost* that never fires again
-and never decays. The `claimed_at` timestamp is the heartbeat: any row sitting in
-`processing` longer than `STALE_PROCESSING_MS` (5 min) is presumed orphaned and
-becomes re-claimable on the next tick. This makes the claim crash-safe without a
-separate reaper job. Five minutes is comfortably longer than any healthy job
-(the LLM evaluation is itself capped well below that — see below), so a row is
-only ever reclaimed when its original worker is genuinely gone.
 
 **Why `Promise.allSettled` for the batch?**
 Each claimed row is fired inside its own try/catch and the whole batch is run
@@ -102,30 +92,13 @@ and roll forward to tomorrow if today's slot has already passed. This keeps a
 "7:00am every day" job pinned to 7:00am local indefinitely, with no drift, even
 on a server running in UTC.
 
-**Why bound the expensive (LLM) job with a timeout?**
-The batch runs through `Promise.allSettled`, so the tick doesn't return until the
-*slowest* job in it settles. A standing-goal evaluation calls an LLM; a hung or
-pathologically slow model turn would otherwise stall the entire sweep — including
-the cheap reminders sharing that batch — past the tick window. Each expensive
-evaluation is wrapped in a hard `EXPENSIVE_JOB_TIMEOUT_MS` (20s) ceiling; on
-timeout it rejects, the kind's `catch` collapses to `skip`, and the row simply
-backs off and retries. This caps the worst-case tick latency at one timeout
-rather than one unbounded model call. (For heavier autonomy — many standing-goal
-rows — split the work into separate *fast-track* and *long-running* queues drained
-by independent workers so a backlog of slow LLM jobs can never delay an urgent
-reminder; see Limitations.)
-
 **Why deliver through an outbound queue?**
 A fired job doesn't push to a websocket or call a client directly — it inserts a
 row into an `outbound` table (a title, a body, and a small stack of display
 cards). The client drains this queue whenever it connects. This decouples *doing
 the work* from *the user being online to see it*: the morning brief is built and
 queued at 7:00am whether or not the app is open, and shown the moment the user
-returns. The outbound table carries a `created_at` timestamp (default `now()`)
-with an index on `(wallet, created_at)`; one tick can queue several messages in
-the same instant, so the client must drain with `ORDER BY created_at, id` to
-reconstruct the true chronological order rather than relying on PK/insertion
-order.
+returns.
 
 ## Algorithm
 
@@ -133,11 +106,9 @@ order.
 TICK_MS = 30s ; BATCH_SIZE = 25 ; MAX_CONSECUTIVE_FAILS = 5
 
 tick():
-  # claim picks up due pending rows AND ghosts (processing rows whose worker
-  # crashed: claimed_at older than STALE_PROCESSING_MS)
-  due = atomicClaim(BATCH_SIZE)          # UPDATE … SET claimed_at=now() … FOR UPDATE SKIP LOCKED RETURNING *
+  due = atomicClaim(BATCH_SIZE)          # UPDATE … FOR UPDATE SKIP LOCKED RETURNING *
   if due empty: return
-  allSettled(due.map(row => process(row)))   # expensive kinds bounded by EXPENSIVE_JOB_TIMEOUT_MS
+  allSettled(due.map(row => process(row)))
 
 process(row):
   try:
@@ -212,13 +183,6 @@ scheduler.stop();
 - **Single-table contention.** The atomic claim serializes on one table. At very
   high job volume, partition the table by tenant or shard the claim by a hash
   range so instances claim disjoint partitions.
-- **One queue for fast and slow jobs.** Cheap jobs (reminders, watches) and
-  expensive ones (LLM standing-goal evaluations) share a single batch. The
-  per-job timeout caps how long a slow job can hold up its batch, but a tick that
-  happens to claim several slow jobs at once still pays for them serially within
-  the `allSettled`. For heavy autonomous workloads, route expensive kinds to a
-  separate *long-running* queue drained by its own worker pool, leaving a
-  *fast-track* queue for latency-sensitive deliveries.
 - **Backoff is per-kind, not adaptive.** A persistently flaky upstream gets the
   same fixed backoff regardless of recent error rate. An exponential backoff
   keyed on consecutive `skip`s would be gentler on a struggling dependency.

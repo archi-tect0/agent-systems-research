@@ -1,0 +1,79 @@
+{
+  "id": "consumer-app--quorum-consensus--realtime",
+  "domain": {
+    "id": "consumer-app",
+    "name": "Consumer App",
+    "description": "Everyday utility and productivity software — the agent reads/writes structured personal data and calls a modest set of well-known tools.",
+    "examples": [
+      "habit tracker",
+      "personal finance dashboard",
+      "note-taking app",
+      "meal planner",
+      "travel itinerary builder"
+    ],
+    "guides": [
+      9,
+      12,
+      37,
+      49,
+      68,
+      8,
+      10,
+      60,
+      71
+    ]
+  },
+  "governance": {
+    "id": "quorum-consensus",
+    "name": "Quorum / Consensus",
+    "description": "Multiple parties — agents and/or humans — must agree before an action lands.",
+    "examples": [
+      "family shared-vault withdrawal",
+      "guild treasury spend",
+      "multi-agent negotiation settlement"
+    ],
+    "guides": [
+      29,
+      32,
+      76,
+      49
+    ]
+  },
+  "latency": {
+    "id": "realtime",
+    "name": "Real-Time (<100ms)",
+    "description": "Synchronous interaction loop where the agent must respond within a frame or a breath — games, AR, voice.",
+    "examples": [
+      "live game opponent",
+      "voice-interrupt assistant",
+      "AR overlay that tracks head movement"
+    ],
+    "guides": [
+      11,
+      57,
+      65,
+      83,
+      56
+    ]
+  },
+  "recommendedGuides": [
+    49,
+    8,
+    9,
+    10,
+    11,
+    12,
+    29,
+    32,
+    37,
+    56,
+    57,
+    60,
+    65,
+    68,
+    71,
+    76,
+    83
+  ],
+  "pitch": "A consumer app governed by quorum / consensus, operating at real-time (<100ms) latency."
+}

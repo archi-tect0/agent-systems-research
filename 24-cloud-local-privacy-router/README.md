@@ -1,5 +1,8 @@
 # Cloud / Local Privacy Router
 
+
+*Part of the [research/ index](../README.md) — see [Start Here](../README.md#start-here) for the recommended reading order.*
+
 ## Problem
 
 A hybrid agent has two places to run a turn: a small **local** model on the user's device (private, but limited) and a powerful **cloud** model (capable, but it sees everything you send it). The naive policies are both wrong:

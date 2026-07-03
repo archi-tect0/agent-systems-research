@@ -1,0 +1,75 @@
+{
+  "id": "creative-media--passkey-gated--scheduled-deferred",
+  "domain": {
+    "id": "creative-media",
+    "name": "Creative / Generative Media",
+    "description": "Tools that generate or remix art, music, video, or 3D scenes — the agent's output *is* the product, not just a means to an action.",
+    "examples": [
+      "AI album cover generator",
+      "procedural music composer",
+      "text-to-3D scene builder",
+      "style-transfer video editor"
+    ],
+    "guides": [
+      30,
+      54,
+      61,
+      63,
+      35,
+      5
+    ]
+  },
+  "governance": {
+    "id": "passkey-gated",
+    "name": "Passkey-Gated",
+    "description": "Every state-changing action requires a fresh biometric/WebAuthn proof — the passkey floor.",
+    "examples": [
+      "wallet transfer confirmation",
+      "guardian recovery approval",
+      "high-value in-game trade"
+    ],
+    "guides": [
+      20,
+      14,
+      29,
+      45,
+      49
+    ]
+  },
+  "latency": {
+    "id": "scheduled-deferred",
+    "name": "Scheduled / Deferred (minutes–days)",
+    "description": "Clock-driven or long-horizon work — cron-like recurrence, slow calibration, periodic audits.",
+    "examples": [
+      "weekly digest email",
+      "quarterly goal check-in",
+      "self-tuning threshold recalibration"
+    ],
+    "guides": [
+      8,
+      71,
+      98,
+      101,
+      44
+    ]
+  },
+  "recommendedGuides": [
+    5,
+    8,
+    14,
+    20,
+    29,
+    30,
+    35,
+    44,
+    45,
+    49,
+    54,
+    61,
+    63,
+    71,
+    98,
+    101
+  ],
+  "pitch": "A creative / generative media governed by passkey-gated, operating at scheduled / deferred (minutes–days) latency."
+}

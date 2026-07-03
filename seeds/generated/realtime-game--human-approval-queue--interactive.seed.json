@@ -1,0 +1,77 @@
+{
+  "id": "realtime-game--human-approval-queue--interactive",
+  "domain": {
+    "id": "realtime-game",
+    "name": "Real-Time Game",
+    "description": "Multiplayer or single-player interactive entertainment where state must sync at sub-frame latency and the agent may be a player, narrator, or opponent.",
+    "examples": [
+      "co-op dungeon crawler with an AI dungeon master",
+      "1v1 card game with a bluffing AI opponent",
+      "shared-world sandbox",
+      "rhythm game with generative levels"
+    ],
+    "guides": [
+      11,
+      27,
+      57,
+      61,
+      63,
+      64,
+      65,
+      83
+    ]
+  },
+  "governance": {
+    "id": "human-approval-queue",
+    "name": "Human Approval Queue",
+    "description": "The agent proposes a batch of actions; a human reviews and approves before anything executes.",
+    "examples": [
+      "draft-and-review social posting",
+      "proposed code merge queue",
+      "weekly budget reallocation review"
+    ],
+    "guides": [
+      49,
+      48,
+      44,
+      39
+    ]
+  },
+  "latency": {
+    "id": "interactive",
+    "name": "Interactive (sub-second)",
+    "description": "Conversational, turn-based UI latency — the user waits for one reply, not a stream of frames.",
+    "examples": [
+      "chat assistant",
+      "form-filling copilot",
+      "code review comment bot"
+    ],
+    "guides": [
+      12,
+      9,
+      50,
+      68,
+      40
+    ]
+  },
+  "recommendedGuides": [
+    9,
+    11,
+    12,
+    27,
+    39,
+    40,
+    44,
+    48,
+    49,
+    50,
+    57,
+    61,
+    63,
+    64,
+    65,
+    68,
+    83
+  ],
+  "pitch": "A real-time game governed by human approval queue, operating at interactive (sub-second) latency."
+}

@@ -1,5 +1,8 @@
 # Headless Read-Only Reasoning Shards
 
+
+*Part of the [research/ index](../README.md) — see [Start Here](../README.md#start-here) for the recommended reading order.*
+
 ## Problem
 
 When an agent faces a hard decision, running a single model pass is fragile: the model can be confidently wrong, and there is no second opinion. A natural improvement is to spawn several reasoning branches in parallel — a proposer, a dissenting reviewer, an independent analyst — and combine their findings. But parallel cognition introduces two new risks:

@@ -1,0 +1,77 @@
+{
+  "id": "realtime-game--quorum-consensus--async-background",
+  "domain": {
+    "id": "realtime-game",
+    "name": "Real-Time Game",
+    "description": "Multiplayer or single-player interactive entertainment where state must sync at sub-frame latency and the agent may be a player, narrator, or opponent.",
+    "examples": [
+      "co-op dungeon crawler with an AI dungeon master",
+      "1v1 card game with a bluffing AI opponent",
+      "shared-world sandbox",
+      "rhythm game with generative levels"
+    ],
+    "guides": [
+      11,
+      27,
+      57,
+      61,
+      63,
+      64,
+      65,
+      83
+    ]
+  },
+  "governance": {
+    "id": "quorum-consensus",
+    "name": "Quorum / Consensus",
+    "description": "Multiple parties — agents and/or humans — must agree before an action lands.",
+    "examples": [
+      "family shared-vault withdrawal",
+      "guild treasury spend",
+      "multi-agent negotiation settlement"
+    ],
+    "guides": [
+      29,
+      32,
+      76,
+      49
+    ]
+  },
+  "latency": {
+    "id": "async-background",
+    "name": "Async / Background (seconds–minutes)",
+    "description": "Work that runs off the interaction thread and reports back — jobs, pipelines, batch tool chains.",
+    "examples": [
+      "nightly portfolio rebalance job",
+      "batch image upscaling queue",
+      "multi-step research report generator"
+    ],
+    "guides": [
+      8,
+      26,
+      55,
+      58,
+      71
+    ]
+  },
+  "recommendedGuides": [
+    8,
+    11,
+    26,
+    27,
+    29,
+    32,
+    49,
+    55,
+    57,
+    58,
+    61,
+    63,
+    64,
+    65,
+    71,
+    76,
+    83
+  ],
+  "pitch": "A real-time game governed by quorum / consensus, operating at async / background (seconds–minutes) latency."
+}

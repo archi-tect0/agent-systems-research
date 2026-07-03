@@ -1,5 +1,8 @@
 # Conversation State Kernel — Per-Turn Governance FSM
 
+
+*Part of the [research/ index](../README.md) — see [Start Here](../README.md#start-here) for the recommended reading order.*
+
 ## Problem
 
 A streaming conversational agent that can call tools, spawn background workers, and react to rapid-fire input has a control-flow problem that a simple request/response handler does not. Consider a single conversation where the user says, in quick succession:

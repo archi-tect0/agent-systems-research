@@ -1,0 +1,78 @@
+{
+  "id": "consumer-app--budgeted-delegation--scheduled-deferred",
+  "domain": {
+    "id": "consumer-app",
+    "name": "Consumer App",
+    "description": "Everyday utility and productivity software — the agent reads/writes structured personal data and calls a modest set of well-known tools.",
+    "examples": [
+      "habit tracker",
+      "personal finance dashboard",
+      "note-taking app",
+      "meal planner",
+      "travel itinerary builder"
+    ],
+    "guides": [
+      9,
+      12,
+      37,
+      49,
+      68,
+      8,
+      10,
+      60,
+      71
+    ]
+  },
+  "governance": {
+    "id": "budgeted-delegation",
+    "name": "Budgeted Delegation",
+    "description": "The agent has a spend/action budget and acts freely inside it, escalating only when it would exceed the cap.",
+    "examples": [
+      "daily grocery auto-reorder under a $50 cap",
+      "in-game currency auto-spend on consumables",
+      "ad-spend autopilot with a monthly ceiling"
+    ],
+    "guides": [
+      17,
+      18,
+      70,
+      96
+    ]
+  },
+  "latency": {
+    "id": "scheduled-deferred",
+    "name": "Scheduled / Deferred (minutes–days)",
+    "description": "Clock-driven or long-horizon work — cron-like recurrence, slow calibration, periodic audits.",
+    "examples": [
+      "weekly digest email",
+      "quarterly goal check-in",
+      "self-tuning threshold recalibration"
+    ],
+    "guides": [
+      8,
+      71,
+      98,
+      101,
+      44
+    ]
+  },
+  "recommendedGuides": [
+    8,
+    71,
+    9,
+    10,
+    12,
+    17,
+    18,
+    37,
+    44,
+    49,
+    60,
+    68,
+    70,
+    96,
+    98,
+    101
+  ],
+  "pitch": "A consumer app governed by budgeted delegation, operating at scheduled / deferred (minutes–days) latency."
+}

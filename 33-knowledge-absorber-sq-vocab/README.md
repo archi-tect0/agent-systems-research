@@ -1,5 +1,8 @@
 # Knowledge Absorber → Zero-Token Vocabulary
 
+
+*Part of the [research/ index](../README.md) — see [Start Here](../README.md#start-here) for the recommended reading order.*
+
 ## Problem
 
 An agent built on a small local model has a fixed knowledge base — its weights. When it hits something it doesn't know, the usual fix is *retrieval*: pull a fact into the prompt at runtime. But retrieval has a recurring cost. Every time the agent needs that fact, it re-injects the same text into the context and pays for it in tokens, again and again, forever.

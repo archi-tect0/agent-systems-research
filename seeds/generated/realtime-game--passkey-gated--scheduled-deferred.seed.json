@@ -1,0 +1,79 @@
+{
+  "id": "realtime-game--passkey-gated--scheduled-deferred",
+  "domain": {
+    "id": "realtime-game",
+    "name": "Real-Time Game",
+    "description": "Multiplayer or single-player interactive entertainment where state must sync at sub-frame latency and the agent may be a player, narrator, or opponent.",
+    "examples": [
+      "co-op dungeon crawler with an AI dungeon master",
+      "1v1 card game with a bluffing AI opponent",
+      "shared-world sandbox",
+      "rhythm game with generative levels"
+    ],
+    "guides": [
+      11,
+      27,
+      57,
+      61,
+      63,
+      64,
+      65,
+      83
+    ]
+  },
+  "governance": {
+    "id": "passkey-gated",
+    "name": "Passkey-Gated",
+    "description": "Every state-changing action requires a fresh biometric/WebAuthn proof — the passkey floor.",
+    "examples": [
+      "wallet transfer confirmation",
+      "guardian recovery approval",
+      "high-value in-game trade"
+    ],
+    "guides": [
+      20,
+      14,
+      29,
+      45,
+      49
+    ]
+  },
+  "latency": {
+    "id": "scheduled-deferred",
+    "name": "Scheduled / Deferred (minutes–days)",
+    "description": "Clock-driven or long-horizon work — cron-like recurrence, slow calibration, periodic audits.",
+    "examples": [
+      "weekly digest email",
+      "quarterly goal check-in",
+      "self-tuning threshold recalibration"
+    ],
+    "guides": [
+      8,
+      71,
+      98,
+      101,
+      44
+    ]
+  },
+  "recommendedGuides": [
+    8,
+    11,
+    14,
+    20,
+    27,
+    29,
+    44,
+    45,
+    49,
+    57,
+    61,
+    63,
+    64,
+    65,
+    71,
+    83,
+    98,
+    101
+  ],
+  "pitch": "A real-time game governed by passkey-gated, operating at scheduled / deferred (minutes–days) latency."
+}

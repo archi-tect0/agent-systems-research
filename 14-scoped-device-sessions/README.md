@@ -1,5 +1,8 @@
 # Scoped Device Sessions
 
+
+*Part of the [research/ index](../README.md) — see [Start Here](../README.md#start-here) for the recommended reading order.*
+
 ## Problem
 
 A user signed in on their phone wants to use the same account on a laptop without typing credentials or moving a hardware key. The common pattern is QR-code pairing: the laptop shows a QR code, the phone scans it and approves, the laptop gets a session.

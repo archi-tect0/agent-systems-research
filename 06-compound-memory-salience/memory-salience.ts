@@ -5,7 +5,7 @@
  *
  *   salience = (W_sim*similarity + W_rec*recency*freshBoost
  *               + W_emo*emotional + W_conf*confidence + W_trust*sourceTrust)
- *              * (0.7 + 0.6 * priorityNorm)
+ *              * (0.7 + 0.3 * priorityNorm)
  *
  * and provides a two-phase retrieval (corrections bypass the cosine race) plus
  * a soft-archive consolidation pass for housekeeping.
@@ -77,16 +77,8 @@ const SOURCE_TRUST_MAP: Record<string, number> = {
 
 const HALF_LIFE_DAYS  = 14;
 const DAY_MS          = 86_400_000;
-const HOUR_MS         = 60 * 60 * 1000;
-const FRESH_WINDOW_HOURS = 2;                 // session-fresh boost tapers over this window
-const FRESH_BOOST       = 1.6;                // recency multiplier at age 0
-const FRESH_BOOST_FLOOR = 1.3;                // multiplier at the end of the window (before dropping to 1.0)
-
-// Phase-2 candidate pool: over-fetch raw vector hits, score the whole pool, then
-// slice to k — so a highly salient but topically distant memory isn't cut by the
-// vector index before the compound score is ever computed.
-const VECTOR_CANDIDATE_MULTIPLIER = 3;
-const VECTOR_CANDIDATE_MIN        = 50;
+const FRESH_WINDOW_MS = 2 * 60 * 60 * 1000;   // 2 hours
+const FRESH_BOOST     = 1.6;
 
 // ── Recency decay ─────────────────────────────────────────────────────────────
 // Exponential decay: full score if touched now, half-score after HALF_LIFE_DAYS.
@@ -104,18 +96,10 @@ export function computeSalience(m: SalienceInput): number {
   const sourceTrust  = SOURCE_TRUST_MAP[m.source] ?? 0.6;
   const priorityNorm = Math.min(1, m.priority / 100);
 
-  // Session-fresh boost: memories touched recently surface above static seeds so
-  // mid-session facts win the recency race. Linearly taper the multiplier from
-  // FRESH_BOOST (age 0) down to FRESH_BOOST_FLOOR at the end of the window instead
-  // of a hard 1.6→1.0 step, so a memory's score doesn't fall off a cliff the
-  // instant it crosses the 2-hour mark mid-conversation.
-  let freshBoost = 1.0;
-  if (m.lastTouchedAt) {
-    const hoursSince = (Date.now() - m.lastTouchedAt.getTime()) / HOUR_MS;
-    if (hoursSince <= FRESH_WINDOW_HOURS) {
-      freshBoost = FRESH_BOOST - (FRESH_BOOST - FRESH_BOOST_FLOOR) * (hoursSince / FRESH_WINDOW_HOURS);
-    }
-  }
+  // Session-fresh boost: memories touched in the last 2h surface above static
+  // seeds so mid-session facts always win the recency race.
+  const freshBoost = (m.lastTouchedAt && m.lastTouchedAt.getTime() > Date.now() - FRESH_WINDOW_MS)
+    ? FRESH_BOOST : 1.0;
 
   const raw =
     W_SIMILARITY   * m.similarity            +
@@ -124,9 +108,8 @@ export function computeSalience(m: SalienceInput): number {
     W_CONFIDENCE   * m.confidence            +
     W_SOURCE_TRUST * sourceTrust;
 
-  // Class priority modulates the final score by ±30%, centered on a baseline of
-  // 1.0 at priority 50: priority 0 → ×0.7, priority 50 → ×1.0, priority 100 → ×1.3.
-  return raw * (0.7 + 0.6 * priorityNorm);
+  // Class priority modulates the final score by up to ±30%.
+  return raw * (0.7 + 0.3 * priorityNorm);
 }
 
 /**
@@ -190,8 +173,7 @@ export async function searchMemory(
   const semanticClasses = classes.filter(c => c !== "correction");
   if (semanticClasses.length > 0 && opts.query) {
     results.push(...await store.vectorSearch({
-      wallet: opts.wallet, query: opts.query, classes: semanticClasses,
-      limit: Math.max(VECTOR_CANDIDATE_MIN, k * VECTOR_CANDIDATE_MULTIPLIER),
+      wallet: opts.wallet, query: opts.query, classes: semanticClasses, limit: k + 8,
     }));
   }
 

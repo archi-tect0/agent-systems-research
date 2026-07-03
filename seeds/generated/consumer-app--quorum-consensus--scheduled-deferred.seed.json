@@ -1,0 +1,77 @@
+{
+  "id": "consumer-app--quorum-consensus--scheduled-deferred",
+  "domain": {
+    "id": "consumer-app",
+    "name": "Consumer App",
+    "description": "Everyday utility and productivity software — the agent reads/writes structured personal data and calls a modest set of well-known tools.",
+    "examples": [
+      "habit tracker",
+      "personal finance dashboard",
+      "note-taking app",
+      "meal planner",
+      "travel itinerary builder"
+    ],
+    "guides": [
+      9,
+      12,
+      37,
+      49,
+      68,
+      8,
+      10,
+      60,
+      71
+    ]
+  },
+  "governance": {
+    "id": "quorum-consensus",
+    "name": "Quorum / Consensus",
+    "description": "Multiple parties — agents and/or humans — must agree before an action lands.",
+    "examples": [
+      "family shared-vault withdrawal",
+      "guild treasury spend",
+      "multi-agent negotiation settlement"
+    ],
+    "guides": [
+      29,
+      32,
+      76,
+      49
+    ]
+  },
+  "latency": {
+    "id": "scheduled-deferred",
+    "name": "Scheduled / Deferred (minutes–days)",
+    "description": "Clock-driven or long-horizon work — cron-like recurrence, slow calibration, periodic audits.",
+    "examples": [
+      "weekly digest email",
+      "quarterly goal check-in",
+      "self-tuning threshold recalibration"
+    ],
+    "guides": [
+      8,
+      71,
+      98,
+      101,
+      44
+    ]
+  },
+  "recommendedGuides": [
+    8,
+    49,
+    71,
+    9,
+    10,
+    12,
+    29,
+    32,
+    37,
+    44,
+    60,
+    68,
+    76,
+    98,
+    101
+  ],
+  "pitch": "A consumer app governed by quorum / consensus, operating at scheduled / deferred (minutes–days) latency."
+}

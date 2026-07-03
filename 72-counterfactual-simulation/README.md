@@ -1,5 +1,8 @@
 # Counterfactual Simulation
 
+
+*Part of the [research/ index](../README.md) — see [Start Here](../README.md#start-here) for the recommended reading order.*
+
 *Dry-running a multi-step, partly-irreversible plan against a clone of the world model — proving it safe, catching its first failure, exposing strand risk, and repairing it — all before touching anything real.*
 
 The metacognitive self-repair guide ([guide 66](../66-metacognitive-self-repair/)) and the capability-acquisition guide ([guide 69](../69-self-directed-capability-acquisition/)) share one safety move: act on a *clone*, never the live thing. This guide points that move forward in time. Instead of repairing a fault after it happens, the agent *predicts* the fault by simulating its plan on a copy of the world — and avoids the fault entirely.

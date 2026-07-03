@@ -1,5 +1,8 @@
 # Ephemeral Presence Registry with Privacy Blackout
 
+
+*Part of the [research/ index](../README.md) — see [Start Here](../README.md#start-here) for the recommended reading order.*
+
 ## Problem
 
 An assistant that runs across several of a person's devices benefits from knowing whether that person is *present* right now: are they actively interacting, did a phone just detect motion, is a microphone listening, or has everything gone quiet for ten minutes? This ambient awareness lets the assistant decide whether to interrupt, when to follow up, and how to phrase things ("you were here a minute ago" vs "welcome back").

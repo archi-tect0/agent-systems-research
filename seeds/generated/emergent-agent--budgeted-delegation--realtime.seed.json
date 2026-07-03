@@ -1,0 +1,79 @@
+{
+  "id": "emergent-agent--budgeted-delegation--realtime",
+  "domain": {
+    "id": "emergent-agent",
+    "name": "Emergent Multi-Agent / Speculative",
+    "description": "Categories that don't fully exist yet — societies of cooperating or competing agents, agent-run micro-businesses, self-modifying software written by the thing it runs.",
+    "examples": [
+      "agent-run marketplace stall that negotiates its own prices",
+      "swarm of agents co-authoring a living document",
+      "self-patching game NPC economy",
+      "AI guild that hires other AIs for sub-tasks"
+    ],
+    "guides": [
+      28,
+      76,
+      77,
+      78,
+      69,
+      66,
+      67,
+      81,
+      38
+    ]
+  },
+  "governance": {
+    "id": "budgeted-delegation",
+    "name": "Budgeted Delegation",
+    "description": "The agent has a spend/action budget and acts freely inside it, escalating only when it would exceed the cap.",
+    "examples": [
+      "daily grocery auto-reorder under a $50 cap",
+      "in-game currency auto-spend on consumables",
+      "ad-spend autopilot with a monthly ceiling"
+    ],
+    "guides": [
+      17,
+      18,
+      70,
+      96
+    ]
+  },
+  "latency": {
+    "id": "realtime",
+    "name": "Real-Time (<100ms)",
+    "description": "Synchronous interaction loop where the agent must respond within a frame or a breath — games, AR, voice.",
+    "examples": [
+      "live game opponent",
+      "voice-interrupt assistant",
+      "AR overlay that tracks head movement"
+    ],
+    "guides": [
+      11,
+      57,
+      65,
+      83,
+      56
+    ]
+  },
+  "recommendedGuides": [
+    11,
+    17,
+    18,
+    28,
+    38,
+    56,
+    57,
+    65,
+    66,
+    67,
+    69,
+    70,
+    76,
+    77,
+    78,
+    81,
+    83,
+    96
+  ],
+  "pitch": "A emergent multi-agent / speculative governed by budgeted delegation, operating at real-time (<100ms) latency."
+}

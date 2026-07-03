@@ -1,5 +1,8 @@
 # Calibrated Uncertainty Engine
 
+
+*Part of the [research/ index](../README.md) — see [Start Here](../README.md#start-here) for the recommended reading order.*
+
 *One honest number per claim — derived from evidence, bent toward the agent's real hit rate, and turned into act / escalate / abstain against a floor that scales with the stakes.*
 
 An agent that sounds equally confident about "this song is lo-fi" and "send 2 ETH to this address" is dangerous in exactly the second case. This guide gives the agent a single **calibrated confidence** per decision and a policy that converts it into one of three actions. The number is *calibrated* — meaning it has been checked against reality, so a stated "0.9" actually corresponds to being right about nine times in ten, not to a tone of voice.

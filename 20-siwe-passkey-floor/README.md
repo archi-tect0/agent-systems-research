@@ -1,5 +1,8 @@
 # SIWE Login with a Passkey Floor
 
+
+*Part of the [research/ index](../README.md) — see [Start Here](../README.md#start-here) for the recommended reading order.*
+
 ## Problem
 
 Sign-In With Ethereum (SIWE, EIP-4361) authenticates a user by having them sign a structured message with their wallet key. It is a clean, decentralized login: prove control of an address, get a session. But a SIWE session is a *bearer* credential — once issued, anyone holding the session token can act as the user until it expires. If that token leaks (XSS, a malicious browser extension, a stolen device with an unlocked session), the attacker can drain the wallet.

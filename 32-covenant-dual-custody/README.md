@@ -1,5 +1,8 @@
 # Covenant Dual-Custody (paired human + machine identity NFTs)
 
+
+*Part of the [research/ index](../README.md) — see [Start Here](../README.md#start-here) for the recommended reading order.*
+
 ## Problem
 
 When an autonomous agent acts on a user's behalf — signing, spending, proving identity — you want a durable, verifiable record that **both the human and the machine were bound together at the moment the relationship was created**. Not "the user has an agent" as a mutable config flag, but a cryptographic artifact that says: *this human identity and this specific machine identity were co-minted, as a pair, at bind time.*

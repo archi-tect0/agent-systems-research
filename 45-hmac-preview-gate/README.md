@@ -1,5 +1,8 @@
 # Stateless HMAC Preview-Gate Tokens
 
+
+*Part of the [research/ index](../README.md) — see [Start Here](../README.md#start-here) for the recommended reading order.*
+
 ## Problem
 
 A site under development is often put behind a single shared password — a "preview gate" — so that only people who know the phrase can see it. The simplest implementation prompts for the password, checks it server-side, and then needs some way to remember that this client already passed, so the prompt does not reappear on every page load.

@@ -1,5 +1,8 @@
 # Will / Objective Topology + Constitutional Guardrail Layer
 
+
+*Part of the [research/ index](../README.md) — see [Start Here](../README.md#start-here) for the recommended reading order.*
+
 ## Problem
 
 A capable agent that only optimizes the *local* prompt drifts. Asked to "book the cheapest flight," it books a red-eye through three connections because that was literally cheapest — violating the user's standing preference never to fly overnight. Asked to "clean up old files," a prompt-injected document convinces it that deleting the backup vault counts as cleanup. The agent satisfied the immediate instruction and betrayed the user's enduring intent.

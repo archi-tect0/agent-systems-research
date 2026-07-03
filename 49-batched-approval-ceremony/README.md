@@ -1,5 +1,8 @@
 # Batched Single-Signature Approval Queue
 
+
+*Part of the [research/ index](../README.md) — see [Start Here](../README.md#start-here) for the recommended reading order.*
+
 ## Problem
 
 An autonomous agent often decides, within a single reasoning turn, to take several write actions at once: tag a contact, draft a message, rename a label, and move some funds. The naive approach prompts the operator for approval once per action — three or four separate confirmation ceremonies (passkey taps, signatures, MFA prompts) for what the user thinks of as one request. This is both annoying and dangerous: approval fatigue trains people to confirm without reading.

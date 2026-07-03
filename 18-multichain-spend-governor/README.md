@@ -1,5 +1,8 @@
 # Multi-Chain Spend Governor (velocity limits + fail-closed pricing + guardian freeze)
 
+
+*Part of the [research/ index](../README.md) — see [Start Here](../README.md#start-here) for the recommended reading order.*
+
 ## Problem
 
 A wallet holds assets on many chains — Bitcoin, Solana (and its SPL tokens), TRON, and a family of EVM chains — and we want to enforce **one coherent spending policy across all of them**:

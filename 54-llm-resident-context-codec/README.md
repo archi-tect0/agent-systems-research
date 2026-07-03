@@ -1,5 +1,8 @@
 # LLM-Resident Context Codec (Token-Space Shorthand)
 
+
+*Part of the [research/ index](../README.md) — see [Start Here](../README.md#start-here) for the recommended reading order.*
+
 ## Problem
 
 Large language model prompts are billed and rate-limited by token count, not by character count or semantic content. A system prompt, tool schema, or conversation history that repeats the same phrases hundreds of times pays for those tokens on every call. On hosted backends this is direct cost; on local CPU inference it is prefill latency.

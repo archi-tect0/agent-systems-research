@@ -1,5 +1,8 @@
 # Resilient Multi-Provider LLM Routing
 
+
+*Part of the [research/ index](../README.md) — see [Start Here](../README.md#start-here) for the recommended reading order.*
+
 ## Problem
 
 A production conversational agent depends on a frontier LLM that it does not control. Hosted models go down, rate-limit, return HTTP 200 with an empty body, or briefly degrade. If the agent has exactly one upstream, every one of those events becomes a user-visible outage.

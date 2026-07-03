@@ -1,5 +1,8 @@
 # Self-Directed Capability Acquisition
 
+
+*Part of the [research/ index](../README.md) — see [Start Here](../README.md#start-here) for the recommended reading order.*
+
 *The agent notices a capability it does not have, drafts the tool on a throwaway branch, proves it against generated cases, and registers it inert until a human approves it and assigns an authority band.*
 
 Self-repair ([guide 66](../66-metacognitive-self-repair/)) fixes a capability the agent *already has* and that broke. This is the other half of self-maintenance: growing a capability the agent *lacks*. It is the natural successor to the repair loop — same governance wall, opposite direction: repair restores, acquisition extends.

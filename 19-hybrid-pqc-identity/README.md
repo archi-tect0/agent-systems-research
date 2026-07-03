@@ -1,5 +1,8 @@
 # Hybrid Post-Quantum Identity
 
+
+*Part of the [research/ index](../README.md) — see [Start Here](../README.md#start-here) for the recommended reading order.*
+
 ## Problem
 
 An account today is anchored by an ECDSA keypair (secp256k1 — the EVM/Bitcoin curve) or an RSA signing key (OIDC id-tokens). Both are broken by a sufficiently large quantum computer running Shor's algorithm. The migration to post-quantum (PQ) signatures cannot be a flag day: legacy verifiers still only understand ECDSA/RSA, and the user base cannot be asked to manually generate and back up a second keypair.

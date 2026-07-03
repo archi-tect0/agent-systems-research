@@ -46,14 +46,6 @@ export interface ScheduleRow {
   status:       ScheduleStatus;
   failureCount: number;
   lastFiredAt:  Date | null;
-  /**
-   * Stamped with `now` each time the row is flipped to 'processing'. Used to
-   * reclaim ghost rows: a worker that crashes after claiming a row but before
-   * re-arming it would otherwise leave the row stuck in 'processing' forever.
-   * Only ever consulted for rows still in 'processing', so a stale value left on
-   * a row that has since been re-armed to 'pending' is harmless and ignored.
-   */
-  claimedAt:    Date | null;
 }
 
 export interface OutboundMessage {
@@ -64,12 +56,6 @@ export interface OutboundMessage {
   body:       string;
   cards?:     Array<Record<string, unknown>>;
 }
-// NOTE: the outbound table the client drains must carry a `created_at` timestamp
-// (server default now()) with an index on `(wallet, created_at)`. A batch tick
-// can queue several messages in the same instant; the client reconstructs the
-// correct chronological order by selecting `ORDER BY created_at, id`, not by
-// insertion/PK order. Stamping created_at is the deliver() sink's responsibility,
-// not this module's, so it isn't a field on OutboundMessage.
 
 type FireOutcome = "fired" | "skip" | "fail";
 
@@ -80,26 +66,8 @@ const BATCH_SIZE            = 25;
 const MAX_CONSECUTIVE_FAILS = 5;
 const DAY_MS                = 86_400_000;
 
-// A row claimed (flipped to 'processing') longer ago than this is presumed
-// orphaned by a crashed worker and is re-claimable on the next tick.
-const STALE_PROCESSING_MS   = 5 * 60 * 1000;
-// Hard ceiling on a single expensive (LLM) evaluation so one slow model turn
-// can't stall the whole sweep past the tick window.
-const EXPENSIVE_JOB_TIMEOUT_MS = 20 * 1000;
-
 const EXPENSIVE_KINDS: ReadonlySet<ScheduleKind> = new Set(["agenda"]);
 const RECURRING_KINDS: ReadonlySet<ScheduleKind> = new Set(["recurring", "agenda"]);
-
-// ── Pure helper: bound a promise so a hung call can't block the tick ──────────
-function withTimeout<T>(p: Promise<T>, ms: number): Promise<T> {
-  return new Promise<T>((resolve, reject) => {
-    const t = setTimeout(() => reject(new Error("timeout")), ms);
-    p.then(
-      v => { clearTimeout(t); resolve(v); },
-      e => { clearTimeout(t); reject(e); },
-    );
-  });
-}
 
 // ── Pure helper: next daily fire instant (timezone-aware, drift-free) ─────────
 
@@ -125,13 +93,9 @@ export function computeNextDailyFireAt(hour: number, min: number, tzOffsetMin: n
 
 export interface ScheduleStore {
   /**
-   * Atomically claim up to `limit` due rows, flipping them to 'processing'
-   * (stamping claimedAt = now) and returning them. Emulates
+   * Atomically claim up to `limit` due rows (status='pending', fireAt<=now),
+   * flipping them to 'processing' and returning them. Emulates
    * UPDATE … FOR UPDATE SKIP LOCKED RETURNING *.
-   *
-   * A row is "due" if it is pending and fireAt<=now, OR it is a ghost: stuck in
-   * 'processing' with claimedAt older than STALE_PROCESSING_MS (its worker
-   * crashed mid-fire). Reclaiming ghosts is the crash-recovery heartbeat.
    */
   claimDue(now: Date, limit: number): Promise<ScheduleRow[]>;
   update(id: string, patch: Partial<ScheduleRow>): Promise<void>;
@@ -294,9 +258,7 @@ export class Scheduler {
       const goal = (p.goal ?? "").trim();
       if (!goal) return "fail";
       try {
-        const decision = await withTimeout(
-          this.deps.evaluateGoal(goal, row.wallet), EXPENSIVE_JOB_TIMEOUT_MS,
-        );
+        const decision = await this.deps.evaluateGoal(goal, row.wallet);
         if (decision.act && (decision.message ?? "").trim()) {
           await this.deps.deliver({
             wallet: row.wallet, scheduleId: row.id, kind: "agenda",
@@ -322,17 +284,11 @@ export class InMemoryScheduleStore implements ScheduleStore {
   seed(rows: ScheduleRow[]): void { this.rows.push(...rows.map(r => ({ ...r }))); }
 
   async claimDue(now: Date, limit: number): Promise<ScheduleRow[]> {
-    const staleBefore = now.getTime() - STALE_PROCESSING_MS;
     const due = this.rows
-      .filter(r =>
-        (r.status === "pending" && r.fireAt.getTime() <= now.getTime()) ||
-        // Ghost reclaim: a 'processing' row whose worker crashed before re-arming.
-        // claimedAt must be non-null (mirrors SQL `claimed_at < ...`, where NULL
-        // never matches) so a freshly-claimed row is never reclaimed instantly.
-        (r.status === "processing" && r.claimedAt != null && r.claimedAt.getTime() <= staleBefore))
+      .filter(r => r.status === "pending" && r.fireAt.getTime() <= now.getTime())
       .sort((a, b) => a.fireAt.getTime() - b.fireAt.getTime())
       .slice(0, limit);
-    for (const r of due) { r.status = "processing"; r.claimedAt = now; }   // atomic flip
+    for (const r of due) r.status = "processing";   // atomic flip
     return due.map(r => ({ ...r }));
   }
 
@@ -358,15 +314,11 @@ if (process.argv[2] === "--demo") {
     const past = new Date(Date.now() - 1000);
     store.seed([
       { id: "r1", wallet: "w", kind: "reminder", payload: { text: "Call the dentist" },
-        fireAt: past, status: "pending", failureCount: 0, lastFiredAt: null, claimedAt: null },
+        fireAt: past, status: "pending", failureCount: 0, lastFiredAt: null },
       { id: "wt1", wallet: "w", kind: "watch", payload: { symbol: "bitcoin", op: "gt", threshold: 50000 },
-        fireAt: past, status: "pending", failureCount: 0, lastFiredAt: null, claimedAt: null },
+        fireAt: past, status: "pending", failureCount: 0, lastFiredAt: null },
       { id: "db1", wallet: "w", kind: "daily_brief", payload: { briefHour: 7, briefMin: 0, timezoneOffsetMin: -240 },
-        fireAt: past, status: "pending", failureCount: 0, lastFiredAt: null, claimedAt: null },
-      // A ghost: claimed 10 min ago by a worker that crashed before re-arming.
-      { id: "gh1", wallet: "w", kind: "reminder", payload: { text: "Orphaned reminder" },
-        fireAt: past, status: "processing", failureCount: 0, lastFiredAt: null,
-        claimedAt: new Date(Date.now() - 10 * 60 * 1000) },
+        fireAt: past, status: "pending", failureCount: 0, lastFiredAt: null },
     ]);
 
     const delivered: OutboundMessage[] = [];

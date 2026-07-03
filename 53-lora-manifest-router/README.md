@@ -1,5 +1,8 @@
 # Manifest-Driven LoRA Expert Router
 
+
+*Part of the [research/ index](../README.md) — see [Start Here](../README.md#start-here) for the recommended reading order.*
+
 ## Problem
 
 A local inference stack can host many small fine-tuned adapters — LoRA "experts" — each teaching one narrow, stable capability: formatting tool calls, reviewing a transaction for risk, synthesizing a world model from raw conversation, operating memory. Keeping each capability in its own adapter is attractive because each can be trained, evaluated, and upgraded independently, and each carries an explicit boundary describing what it does and does not do.

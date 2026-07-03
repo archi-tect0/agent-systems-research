@@ -1,5 +1,8 @@
 # Behavioral Continuous Authentication
 
+
+*Part of the [research/ index](../README.md) — see [Start Here](../README.md#start-here) for the recommended reading order.*
+
 ## Problem
 
 Authentication is almost always a single gate: pass the login, get a session, then the session is trusted until it expires. Everything after the gate is implicitly the same person. But a device can change hands *after* the gate — handed to someone, snatched while unlocked, used by a different person who knows the PIN. A one-time check at login cannot notice this.

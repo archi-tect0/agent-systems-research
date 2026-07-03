@@ -1,5 +1,8 @@
 # Typed World-Model Graph with Goal Topology
 
+
+*Part of the [research/ index](../README.md) — see [Start Here](../README.md#start-here) for the recommended reading order.*
+
 ## Problem
 
 Most agent "memory" systems are flat: a vector store of text chunks retrieved by

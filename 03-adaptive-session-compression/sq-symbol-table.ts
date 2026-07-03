@@ -1,9 +1,9 @@
 /**
  * Adaptive Session Symbol Table (SQ-B)
  *
- * Learns repeated 5–8 word phrases within an LLM session and generates
- * compact ~-token shorthand identifiers. Inject the codec dictionary into
- * the system prompt before each LLM call; the model uses ~-tokens in its
+ * Learns repeated 3–8 word phrases within an LLM session and generates
+ * compact §-token shorthand identifiers. Inject the codec dictionary into
+ * the system prompt before each LLM call; the model uses §-tokens in its
  * responses when it recognizes the exact matching phrase.
  *
  * Typical savings: 8–18% additional token reduction on top of other
@@ -16,7 +16,7 @@
 
 export interface DictEntry {
   phrase:      string;
-  token:       string;   // ~XXXXXX format (single-token ASCII prefix)
+  token:       string;   // §XXXXXX format
   frequency:   number;   // how many times this phrase has been seen
   lastUsedMs:  number;   // timestamp of last ingest()
   bytesSaved:  number;   // cumulative bytes saved across all uses
@@ -30,9 +30,9 @@ export interface TableSnapshot {
 
 // ── Constants ──────────────────────────────────────────────────────────────────
 
-const MIN_NGRAM_WORDS  = 5;    // long phrases only — short n-grams cost more tokens than they save
+const MIN_NGRAM_WORDS  = 3;
 const MAX_NGRAM_WORDS  = 8;
-const MIN_PHRASE_CHARS = 20;   // skip short phrases — not worth compressing
+const MIN_PHRASE_CHARS = 12;   // skip very short phrases — not worth compressing
 const MIN_BYTES_SAVED  = 8;    // entropy gate: skip entries that save less than this
 const DEFAULT_MAX_ENTRIES = 128;
 
@@ -97,13 +97,7 @@ export class SqSymbolTable {
   /**
    * Score a table entry.
    *   score = frequency×0.6 + recency×0.3 + bytes_per_use×0.1
-   * recency decays with a 60-second half-life within the scoring window.
-   *
-   * bytesSaved is CUMULATIVE (incremented on every hit), so bytesSaved/frequency
-   * is the stable average bytes saved per use — a static tie-breaker favoring
-   * longer phrases. It must divide the cumulative total: dividing a single-use
-   * constant by frequency would shrink as a phrase recurs, wrongly penalizing the
-   * most-repeated phrases (the opposite of the intent).
+   * recency decays exponentially with a 60-second half-life within the scoring window.
    */
   score(entry: DictEntry): number {
     const ageSec      = Math.max(0, Date.now() - entry.lastUsedMs) / 1000;
@@ -126,15 +120,15 @@ export class SqSymbolTable {
   /**
    * Build the codec injection block for the LLM system prompt.
    *
-   * Inject this text before each LLM call. The model will use ~-tokens when
+   * Inject this text before each LLM call. The model will use §-tokens when
    * it recognizes the exact matching phrase in its response.
    *
    * Format:
    *   CODEC SHORTHAND
-   *   Use ~-tokens exactly when you recognize the full matching phrase. ...
+   *   Use §-tokens exactly when you recognize the full matching phrase. ...
    *   session=<id>;version=<v>;entries=<n>
-   *   ~TOKEN1=full phrase one
-   *   ~TOKEN2=another exact phrase
+   *   §TOKEN1=full phrase one
+   *   §TOKEN2=another exact phrase
    */
   buildCodecInjection(skipPhrases?: Set<string>): string {
     const ordered = [...this.entries.values()]
@@ -145,7 +139,7 @@ export class SqSymbolTable {
 
     const lines = [
       "CODEC SHORTHAND",
-      "Use ~-token refs exactly when you recognize the full matching phrase. " +
+      "Use §-token refs exactly when you recognize the full matching phrase. " +
       "Prefer refs only for exact phrase reuse. Do not invent new refs.",
       `session=${this.sessionId};version=${this.version};entries=${ordered.length}`,
       ...ordered.map(e => `${e.token}=${e.phrase}`),
@@ -193,7 +187,7 @@ export class SqSymbolTable {
     const existing = this.entries.get(phrase);
     if (existing) return existing.token;
     const hash = fnv1a32(phrase);
-    return `~${hash.toString(36).toUpperCase()}`;
+    return `§${hash.toString(36).toUpperCase()}`;
   }
 }
 

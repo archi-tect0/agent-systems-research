@@ -1,5 +1,8 @@
 # Agent Spend-Limit Wallet (autonomous spend with a human approval floor)
 
+
+*Part of the [research/ index](../README.md) — see [Start Here](../README.md#start-here) for the recommended reading order.*
+
 ## Problem
 
 An autonomous software agent — an LLM tool-caller, a trading bot, a recurring-payment daemon — needs to *spend money on-chain on its own*. The whole point is that no human is in the loop for routine actions: pay the API bill, top up a subscription, settle a small invoice. But an agent that can move funds without limit is also the perfect blast radius for a bug, a prompt injection, or a stolen session token. "Drain the wallet" is one bad tool call away.

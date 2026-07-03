@@ -1,5 +1,8 @@
 # Hierarchical Spatial Scene Synthesis
 
+
+*Part of the [research/ index](../README.md) — see [Start Here](../README.md#start-here) for the recommended reading order.*
+
 ## Problem
 
 Generating a 3D scene directly as a flat list of engine commands is hard to control. A single pass that emits "place this object here, that light there" has no structure to reason about: it is difficult to keep within a work budget, difficult to lay zones out coherently, and difficult to make deterministic so the same input reliably produces the same output.

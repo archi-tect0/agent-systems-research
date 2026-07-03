@@ -1,5 +1,8 @@
 # In-Stream Sub-Channel Multiplexer with Flow Control
 
+
+*Part of the [research/ index](../README.md) — see [Start Here](../README.md#start-here) for the recommended reading order.*
+
 ## Problem
 
 A connection-level multiplexer already lets one socket carry many independent streams, each on its own QoS lane (see guide 11). But *inside* a single one of those streams there is often a second mixing problem. A single virtual channel may need to carry, simultaneously:

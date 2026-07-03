@@ -1,5 +1,8 @@
 # Multi-Tenant MCP Host with SSRF Defense
 
+
+*Part of the [research/ index](../README.md) — see [Start Here](../README.md#start-here) for the recommended reading order.*
+
 ## Problem
 
 The Model Context Protocol (MCP) lets a third party expose a catalog of tools that an agent can discover and call. Bringing external MCP servers into a multi-tenant agent platform raises three hard problems at once:

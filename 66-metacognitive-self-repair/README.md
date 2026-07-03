@@ -1,5 +1,8 @@
 # Metacognitive Self-Repair Loop
 
+
+*Part of the [research/ index](../README.md) — see [Start Here](../README.md#start-here) for the recommended reading order.*
+
 *Introspect → diagnose → request the right model → fix on a branch → verify → human-gated merge — with a memory of what already worked.*
 
 The point where an agent stops being a chatbot and starts being an operator is the moment it can answer **"what is wrong with me right now?"** — and then do something about it without being able to quietly break itself. This is the first guide in the set that describes how an agent **maintains itself**: it reasons about its own operational state, repairs a fault, remembers the repair, and restores functionality, with the entire write surface walled behind a throwaway branch and a one-tap human approval.

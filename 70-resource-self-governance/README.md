@@ -1,5 +1,8 @@
 # Resource Self-Governance
 
+
+*Part of the [research/ index](../README.md) — see [Start Here](../README.md#start-here) for the recommended reading order.*
+
 *An agent that budgets its own tokens, latency, and cost — trading quality for cheaper paths under pressure, and protecting a reserve so it can always afford to finish.*
 
 The calibrated-uncertainty engine ([guide 68](../68-calibrated-uncertainty-engine/)) decides *whether* to act by weighing confidence against risk. It leaves one term open: what an action *costs*. This guide fills it in. It is the part of a self-maintaining agent that watches its own resource envelope — how many tokens, how much wall-clock, how much money a task has burned — and chooses *how* to do the next step so the whole job lands inside the budget.

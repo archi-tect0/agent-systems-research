@@ -1,0 +1,76 @@
+{
+  "id": "consumer-app--human-approval-queue--interactive",
+  "domain": {
+    "id": "consumer-app",
+    "name": "Consumer App",
+    "description": "Everyday utility and productivity software — the agent reads/writes structured personal data and calls a modest set of well-known tools.",
+    "examples": [
+      "habit tracker",
+      "personal finance dashboard",
+      "note-taking app",
+      "meal planner",
+      "travel itinerary builder"
+    ],
+    "guides": [
+      9,
+      12,
+      37,
+      49,
+      68,
+      8,
+      10,
+      60,
+      71
+    ]
+  },
+  "governance": {
+    "id": "human-approval-queue",
+    "name": "Human Approval Queue",
+    "description": "The agent proposes a batch of actions; a human reviews and approves before anything executes.",
+    "examples": [
+      "draft-and-review social posting",
+      "proposed code merge queue",
+      "weekly budget reallocation review"
+    ],
+    "guides": [
+      49,
+      48,
+      44,
+      39
+    ]
+  },
+  "latency": {
+    "id": "interactive",
+    "name": "Interactive (sub-second)",
+    "description": "Conversational, turn-based UI latency — the user waits for one reply, not a stream of frames.",
+    "examples": [
+      "chat assistant",
+      "form-filling copilot",
+      "code review comment bot"
+    ],
+    "guides": [
+      12,
+      9,
+      50,
+      68,
+      40
+    ]
+  },
+  "recommendedGuides": [
+    9,
+    12,
+    49,
+    68,
+    8,
+    10,
+    37,
+    39,
+    40,
+    44,
+    48,
+    50,
+    60,
+    71
+  ],
+  "pitch": "A consumer app governed by human approval queue, operating at interactive (sub-second) latency."
+}

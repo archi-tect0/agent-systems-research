@@ -1,0 +1,81 @@
+{
+  "id": "emergent-agent--full-autonomy--scheduled-deferred",
+  "domain": {
+    "id": "emergent-agent",
+    "name": "Emergent Multi-Agent / Speculative",
+    "description": "Categories that don't fully exist yet — societies of cooperating or competing agents, agent-run micro-businesses, self-modifying software written by the thing it runs.",
+    "examples": [
+      "agent-run marketplace stall that negotiates its own prices",
+      "swarm of agents co-authoring a living document",
+      "self-patching game NPC economy",
+      "AI guild that hires other AIs for sub-tasks"
+    ],
+    "guides": [
+      28,
+      76,
+      77,
+      78,
+      69,
+      66,
+      67,
+      81,
+      38
+    ]
+  },
+  "governance": {
+    "id": "full-autonomy",
+    "name": "Full Autonomy",
+    "description": "The agent acts unsupervised within its declared authority band — no per-action human gate.",
+    "examples": [
+      "background inbox triage",
+      "auto-adjusting thermostat schedule",
+      "self-balancing game difficulty"
+    ],
+    "guides": [
+      37,
+      38,
+      22,
+      70,
+      78,
+      17
+    ]
+  },
+  "latency": {
+    "id": "scheduled-deferred",
+    "name": "Scheduled / Deferred (minutes–days)",
+    "description": "Clock-driven or long-horizon work — cron-like recurrence, slow calibration, periodic audits.",
+    "examples": [
+      "weekly digest email",
+      "quarterly goal check-in",
+      "self-tuning threshold recalibration"
+    ],
+    "guides": [
+      8,
+      71,
+      98,
+      101,
+      44
+    ]
+  },
+  "recommendedGuides": [
+    38,
+    78,
+    8,
+    17,
+    22,
+    28,
+    37,
+    44,
+    66,
+    67,
+    69,
+    70,
+    71,
+    76,
+    77,
+    81,
+    98,
+    101
+  ],
+  "pitch": "A emergent multi-agent / speculative governed by full autonomy, operating at scheduled / deferred (minutes–days) latency."
+}

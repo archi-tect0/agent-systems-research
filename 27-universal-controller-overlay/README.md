@@ -1,5 +1,8 @@
 # Universal Controller Overlay + Viewport Sync
 
+
+*Part of the [research/ index](../README.md) — see [Start Here](../README.md#start-here) for the recommended reading order.*
+
 ## Problem
 
 A user is running a heavy GPU/3D session on a TV or laptop, but the device with the best input surface is in their hand — their phone. We want to turn the phone into a game controller, touchpad, and keyboard for the big-screen session, and we want it to *just work* with no QR scan, no pairing code, no manual handshake.

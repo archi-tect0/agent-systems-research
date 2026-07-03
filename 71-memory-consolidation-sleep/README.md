@@ -1,5 +1,8 @@
 # Memory Consolidation ("Sleep")
 
+
+*Part of the [research/ index](../README.md) — see [Start Here](../README.md#start-here) for the recommended reading order.*
+
 *A maintenance pass the agent runs on its own memory — forgetting stale trivia, merging redundant entries, and promoting what recurs into durable, pinned lessons.*
 
 The self-directed capability-acquisition guide ([guide 69](../69-self-directed-capability-acquisition/)) is about *growth* — the agent adds a tool when a gap recurs. This guide is its opposite number: *pruning and distillation*. While an agent is awake it accumulates raw episodic memories — every fact, correction, and aside, duplicates and noise included — and without a consolidation pass that store grows without bound and buries its few durable lessons under churn.

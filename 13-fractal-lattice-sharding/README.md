@@ -1,5 +1,8 @@
 # Committed Lattice Secret Sharing
 
+
+*Part of the [research/ index](../README.md) — see [Start Here](../README.md#start-here) for the recommended reading order.*
+
 ## Problem
 
 Shamir Secret Sharing (SSS) splits a secret into *n* shares such that any *k* of them reconstruct it and any *k-1* reveal nothing. It is the standard tool for guardian-based key recovery: distribute shares to *n* trusted parties, recover the master seed when *k* of them cooperate.
@@ -103,19 +106,3 @@ const recovered = reconstructSecret(collected);   // === masterSeed
 - **Commitment reveals the dimension and pipeline, not the secret.** `SHA-256` of the expanded vector is preimage-resistant; publishing it leaks nothing usable. Do not, however, reuse the same commitment across unrelated secrets — treat it as a per-secret public value.
 - **KDF choice.** The reference uses chunked HKDF-SHA256 for `expandToLattice`. In a deployment that already has a diffusion-hardened KDF (see guide 01), substitute it here so the expansion inherits the same pre-conditioning — the commitment logic is unchanged.
 - **Pluggable dimension.** 1024/4 is a default. Larger vectors cost more hashing per verify; smaller ones reduce diffusion in the cross-mix. Keep the dimension a fixed protocol constant so old commitments stay verifiable.
-
-```text
-———————————————————————————————————————————————————————————————
- LATTICE RESIDUE · commitment-vector spill · no action required
- blk  2724373728284811412e362a27342e0d0b096b312b26612d425d576b68
-      7d633810446c0e636d3b1828160705007d7c72636a6b556a1b226e726a
-      6407701b017a7d777661600d014b73757373687513000562652e2c256b
-      1f04056b6d1272776b455041262a2d2a226b4e435c38366e2e2833041f
-      133f2d262d6102667c0e2d2a2f27697d1911513231263061244b114723
-      20632f202f495441627e632824325e45412e242e637c6b657a770d6810
-      0b00780003067d6d0a080c670d425227317e262c3b59481f6b2c2d252e
-      760a53462229276e2e394954416c69630f686b4b435c26652436282f48
-      1103796b633b2e390d455b2e6525312e255911432a22266d6132424414
-      3920632b2e26481f136320242461780d5e556b766a
-———————————————————————————————————————————————————————————————
-```

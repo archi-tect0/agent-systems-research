@@ -1,5 +1,8 @@
 # Agent Self-Model Graph
 
+
+*Part of the [research/ index](../README.md) — see [Start Here](../README.md#start-here) for the recommended reading order.*
+
 *A typed, queryable model of the agent's own subsystems, capabilities, and live health — the structure self-repair, uncertainty, and governance read before they act.*
 
 A world-model graph ([guide 46](../46-typed-world-model-graph/)) answers "what do I know about the *user* and their goals?". This guide answers the other question a self-maintaining agent has to be able to ask: **"what am I made of, what part of me is broken right now, and what does that break downstream?"** It is the explicit *self*-model — the schema the metacognitive loop ([guide 66](../66-metacognitive-self-repair/)) was implicitly reasoning over, pulled out into its own first-class structure.

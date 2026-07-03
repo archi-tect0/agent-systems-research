@@ -1,0 +1,79 @@
+{
+  "id": "emergent-agent--budgeted-delegation--async-background",
+  "domain": {
+    "id": "emergent-agent",
+    "name": "Emergent Multi-Agent / Speculative",
+    "description": "Categories that don't fully exist yet — societies of cooperating or competing agents, agent-run micro-businesses, self-modifying software written by the thing it runs.",
+    "examples": [
+      "agent-run marketplace stall that negotiates its own prices",
+      "swarm of agents co-authoring a living document",
+      "self-patching game NPC economy",
+      "AI guild that hires other AIs for sub-tasks"
+    ],
+    "guides": [
+      28,
+      76,
+      77,
+      78,
+      69,
+      66,
+      67,
+      81,
+      38
+    ]
+  },
+  "governance": {
+    "id": "budgeted-delegation",
+    "name": "Budgeted Delegation",
+    "description": "The agent has a spend/action budget and acts freely inside it, escalating only when it would exceed the cap.",
+    "examples": [
+      "daily grocery auto-reorder under a $50 cap",
+      "in-game currency auto-spend on consumables",
+      "ad-spend autopilot with a monthly ceiling"
+    ],
+    "guides": [
+      17,
+      18,
+      70,
+      96
+    ]
+  },
+  "latency": {
+    "id": "async-background",
+    "name": "Async / Background (seconds–minutes)",
+    "description": "Work that runs off the interaction thread and reports back — jobs, pipelines, batch tool chains.",
+    "examples": [
+      "nightly portfolio rebalance job",
+      "batch image upscaling queue",
+      "multi-step research report generator"
+    ],
+    "guides": [
+      8,
+      26,
+      55,
+      58,
+      71
+    ]
+  },
+  "recommendedGuides": [
+    8,
+    17,
+    18,
+    26,
+    28,
+    38,
+    55,
+    58,
+    66,
+    67,
+    69,
+    70,
+    71,
+    76,
+    77,
+    78,
+    81,
+    96
+  ],
+  "pitch": "A emergent multi-agent / speculative governed by budgeted delegation, operating at async / background (seconds–minutes) latency."
+}

@@ -1,0 +1,77 @@
+{
+  "id": "creative-media--full-autonomy--scheduled-deferred",
+  "domain": {
+    "id": "creative-media",
+    "name": "Creative / Generative Media",
+    "description": "Tools that generate or remix art, music, video, or 3D scenes — the agent's output *is* the product, not just a means to an action.",
+    "examples": [
+      "AI album cover generator",
+      "procedural music composer",
+      "text-to-3D scene builder",
+      "style-transfer video editor"
+    ],
+    "guides": [
+      30,
+      54,
+      61,
+      63,
+      35,
+      5
+    ]
+  },
+  "governance": {
+    "id": "full-autonomy",
+    "name": "Full Autonomy",
+    "description": "The agent acts unsupervised within its declared authority band — no per-action human gate.",
+    "examples": [
+      "background inbox triage",
+      "auto-adjusting thermostat schedule",
+      "self-balancing game difficulty"
+    ],
+    "guides": [
+      37,
+      38,
+      22,
+      70,
+      78,
+      17
+    ]
+  },
+  "latency": {
+    "id": "scheduled-deferred",
+    "name": "Scheduled / Deferred (minutes–days)",
+    "description": "Clock-driven or long-horizon work — cron-like recurrence, slow calibration, periodic audits.",
+    "examples": [
+      "weekly digest email",
+      "quarterly goal check-in",
+      "self-tuning threshold recalibration"
+    ],
+    "guides": [
+      8,
+      71,
+      98,
+      101,
+      44
+    ]
+  },
+  "recommendedGuides": [
+    5,
+    8,
+    17,
+    22,
+    30,
+    35,
+    37,
+    38,
+    44,
+    54,
+    61,
+    63,
+    70,
+    71,
+    78,
+    98,
+    101
+  ],
+  "pitch": "A creative / generative media governed by full autonomy, operating at scheduled / deferred (minutes–days) latency."
+}

@@ -1,5 +1,8 @@
 # Proof-of-Bandwidth Relay Accounting
 
+
+*Part of the [research/ index](../README.md) — see [Start Here](../README.md#start-here) for the recommended reading order.*
+
 ## Problem
 
 A relay node earns its keep by forwarding traffic between peers that cannot

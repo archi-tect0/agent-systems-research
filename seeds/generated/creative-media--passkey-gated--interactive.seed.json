@@ -1,0 +1,75 @@
+{
+  "id": "creative-media--passkey-gated--interactive",
+  "domain": {
+    "id": "creative-media",
+    "name": "Creative / Generative Media",
+    "description": "Tools that generate or remix art, music, video, or 3D scenes — the agent's output *is* the product, not just a means to an action.",
+    "examples": [
+      "AI album cover generator",
+      "procedural music composer",
+      "text-to-3D scene builder",
+      "style-transfer video editor"
+    ],
+    "guides": [
+      30,
+      54,
+      61,
+      63,
+      35,
+      5
+    ]
+  },
+  "governance": {
+    "id": "passkey-gated",
+    "name": "Passkey-Gated",
+    "description": "Every state-changing action requires a fresh biometric/WebAuthn proof — the passkey floor.",
+    "examples": [
+      "wallet transfer confirmation",
+      "guardian recovery approval",
+      "high-value in-game trade"
+    ],
+    "guides": [
+      20,
+      14,
+      29,
+      45,
+      49
+    ]
+  },
+  "latency": {
+    "id": "interactive",
+    "name": "Interactive (sub-second)",
+    "description": "Conversational, turn-based UI latency — the user waits for one reply, not a stream of frames.",
+    "examples": [
+      "chat assistant",
+      "form-filling copilot",
+      "code review comment bot"
+    ],
+    "guides": [
+      12,
+      9,
+      50,
+      68,
+      40
+    ]
+  },
+  "recommendedGuides": [
+    5,
+    9,
+    12,
+    14,
+    20,
+    29,
+    30,
+    35,
+    40,
+    45,
+    49,
+    50,
+    54,
+    61,
+    63,
+    68
+  ],
+  "pitch": "A creative / generative media governed by passkey-gated, operating at interactive (sub-second) latency."
+}

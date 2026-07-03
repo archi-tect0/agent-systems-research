@@ -1,5 +1,8 @@
 # Deterministic Post-Quantum Action Receipts
 
+
+*Part of the [research/ index](../README.md) — see [Start Here](../README.md#start-here) for the recommended reading order.*
+
 ## Problem
 
 When an autonomous agent performs actions on a user's behalf — approving a token transfer, firing an intent, running a scheduled task — there needs to be durable, non-repudiable proof of *what was authorised and executed*. A row in an audit table is not enough: the audit table is server-controlled mutable state. If the server is compromised, restored from an old backup, or simply migrated, the audit trail can be silently rewritten, and there is no way for the user (or a third party) to prove what the agent actually did.

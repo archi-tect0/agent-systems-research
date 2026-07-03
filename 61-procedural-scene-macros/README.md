@@ -1,5 +1,8 @@
 # Procedural Scene Macros for Token-Efficient 3D
 
+
+*Part of the [research/ index](../README.md) — see [Start Here](../README.md#start-here) for the recommended reading order.*
+
 ## Problem
 
 When a language model authors a 3D scene by emitting concrete commands — one

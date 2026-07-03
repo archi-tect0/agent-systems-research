@@ -1,5 +1,8 @@
 # Boundary-Aligned Streaming Pulse Encoder
 
+
+*Part of the [research/ index](../README.md) — see [Start Here](../README.md#start-here) for the recommended reading order.*
+
 ## Problem
 
 Language models emit tokens one at a time, and the naive thing to do is forward each token to the client the instant it arrives. That produces visible flicker. Words appear mid-formation — "Open" then "ing" then " the" — so the reader watches text assemble character group by character group. Markdown and code fragments render half-parsed, because a client that re-renders on every token sees `` ```py `` before the fence is closed. And a text-to-speech layer fed token-by-token stutters on partial words, because it has no way to know where one speakable unit ends and the next begins.

@@ -1,5 +1,8 @@
 # Agent LoRA / Prefix-Weight Compiler
 
+
+*Part of the [research/ index](../README.md) — see [Start Here](../README.md#start-here) for the recommended reading order.*
+
 ## Problem
 
 A locally-run agent has a fixed identity: a system prompt, a consistent voice, and a set of stable facts about its owner ("timezone is America/New_York", "prefers oat flat whites"). Two costs come from carrying that identity:

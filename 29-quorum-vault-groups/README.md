@@ -1,5 +1,8 @@
 # Quorum Vault Groups (M-of-N approval + autonomous child sub-vaults)
 
+
+*Part of the [research/ index](../README.md) — see [Start Here](../README.md#start-here) for the recommended reading order.*
+
 ## Problem
 
 A shared vault — a family account, a team treasury, a DAO sub-budget — needs two governance shapes at once:

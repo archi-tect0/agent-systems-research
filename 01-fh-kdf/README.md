@@ -1,5 +1,8 @@
 # Fibonacci-Harmonic Key Derivation Function (FH-KDF)
 
+
+*Part of the [research/ index](../README.md) — see [Start Here](../README.md#start-here) for the recommended reading order.*
+
 ## Problem
 
 Standard HKDF-SHA256 is a well-audited, widely-deployed KDF. But when deriving key material for post-quantum signature algorithms like ML-DSA-65 (Crystals-Dilithium), a concern arises that falls outside the HKDF security model: **side-channel attacks on the key expansion path**.
@@ -10,11 +13,11 @@ The secondary concern is **algorithm agility**: HKDF-SHA256 inherits any weaknes
 
 ## Design decisions
 
-**Why a seeded full-block permutation?**  
-The permutation's job is to break byte-position regularity in the 64-byte state before mixing, so the harmonic passes operate on a non-sequential arrangement. A fixed index list does this poorly: a reversed Fibonacci sequence (`[55,34,21,13,8,5,3,2,1,1]`) only yields four distinct swaps because the terms grow too fast to cover the block — 56 of the 64 bytes stay in their original contiguous slots, exactly the locality a side-channel attacker can track. Instead, the state is permuted with a **seeded Fisher-Yates shuffle**: the swap order is drawn from a SHA-256 keystream (counter mode) keyed on the state itself, so every one of the 64 positions is visited while the pass stays deterministic and platform-invariant (integer ops + SHA-256 only). No contiguous run is left in place.
+**Why Fibonacci indices for permutation?**  
+A reverse-Fibonacci permutation is deterministic, parameter-free, and has a well-understood geometric structure. It is not cryptographic on its own — its purpose is to break the byte-position regularity in the 64-byte state before mixing, so that the harmonic mixing passes operate on a non-sequential arrangement. Any deterministic, invertible permutation that disrupts contiguous index locality achieves the same goal; Fibonacci was chosen for its simplicity and because the index distribution is non-uniform (denser near the start, sparser near the end), which ensures the swap pattern does not accidentally re-create a linear arrangement.
 
 **Why harmonic series weights?**  
-The harmonic series (1, 1/2, 1/3, ...) is a natural choice for progressive diffusion: early rounds should blend heavily, later rounds lightly, so the mixing function applies strong initial dispersion followed by fine-tuning. The harmonic term is therefore the **neighbor** weight, `NW = floor(65536 / r)`, with the self weight `W = 65536 - NW`. At `r=1` the neighbor pull is maximal (`NW=65536`) and it decays each round (`NW=8192` at `r=8`); `W` correspondingly grows toward 65536. Tying the harmonic term to the neighbor weight is what produces decaying dispersion — and it avoids the degenerate `r=1` case (`NW=0`, no blend at all) that results if the *self* weight is the one set to `floor(65536 / r)`. The weights are pure integer division, platform-invariant, with no floating-point, so output is bit-identical on every CPU architecture and JavaScript engine.
+The harmonic series (1, 1/2, 1/3, ...) is a natural choice for progressive diffusion: early rounds blend heavily, later rounds blend lightly, so the mixing function applies strong initial dispersion followed by fine-tuning. Crucially, the weights are computed as `floor(65536 / r)` — pure integer division, platform-invariant, with no floating-point operations. This guarantees bit-identical output on every CPU architecture and JavaScript engine.
 
 **Why integer (Q16 fixed-point) arithmetic?**  
 Floating-point results vary across CPUs due to rounding modes and FMA instruction availability. A KDF must produce identical output everywhere. Q16 fixed-point (weights expressed as integers out of 65536) achieves the same blending semantics as floating-point but with a closed-form integer expression that produces the same bit pattern on all platforms.
@@ -31,24 +34,23 @@ Input:  ikm   — input key material (Buffer)
         len   — output length in bytes (≤ 64 for single call)
 
 Step 1: base     = HKDF-SHA256(ikm, salt, "fhkdf-v2-init:<info>", 64)
-Step 2: permuted = keyedPermutation(base)
+Step 2: permuted = reverseFibPermutation(base)
 Step 3: mixed    = harmonicMixRounds(permuted, rounds=8)
 Step 4: output   = HKDF-SHA256(mixed, salt, "fhkdf-v2-final:<info>", len)
 
-keyedPermutation(state):                 // seeded Fisher-Yates over all 64 bytes
-  // deterministic keystream, counter mode — touches every position
-  keystream(n): SHA256("fhkdf-v2-perm" || state || uint32_be(n))
-  draw 16-bit values from the keystream as needed
-  for i in 63..1, step -1:               // descending
-    r = next 16-bit keystream value
-    j = r % (i + 1)                       // j in [0, i]
-    swap(state[i], state[j])
+reverseFibPermutation(state):
+  fibs = fibonacci_sequence_up_to(63)   // e.g. [1,1,2,3,5,8,13,21,34,55]
+  rev  = reverse(fibs)                  // [55,34,21,13,8,5,3,2,1,1]
+  for i in 0..len(rev)-2, step 2:
+    a = rev[i]   % 64
+    b = rev[i+1] % 64
+    if a != b: swap(state[a], state[b])
   return state
 
 harmonicMixRounds(state, rounds):
   for r in 1..rounds:
-    NW = floor(65536 / r)          // neighbor weight — harmonic decay (heavy early, light late)
-    W  = 65536 - NW                // self weight — grows toward 65536
+    W  = floor(65536 / r)          // Q16 integer weight
+    NW = 65536 - W
     for i in 0..63:
       next[i] = (state[i]*W + state[(i+1)%64]*NW + 32768) >> 16  // Q16 blend
     digest = SHA256(byte(r) || state)
@@ -98,16 +100,3 @@ const expandedKey = fhKdfExpand(
 - **Round count.** Eight harmonic rounds was chosen to balance diffusion with performance. For hardware-constrained environments, four rounds is a reasonable minimum; above twelve provides diminishing diffusion returns.
 - **Output cap.** The single-call cap of 64 bytes matches the internal state size. For larger outputs use `fhKdfExpand` — this is intentional; chunking with distinct domain labels produces independent block outputs.
 - **Not post-quantum by itself.** FH-KDF uses HKDF-SHA256, which is not post-quantum secure. Pair with `pqHkdf` (guide 02) or use it as a pre-pass before a quantum-safe KDF.
-
-```text
-———————————————————————————————————————————————————————————————
- FH-KDF RESIDUE · harmonic pre-pass spill · no action required
- blk  293320666f20312067676528202e79656b207478656e20656874207364
-      6c6f68203330206564697567206e69206e6f6974617a69746e6175712d
-      62757320656874203b202e2e2e34332c35352c39382c3434312c333332
-      203e2d2036353220646f6d20295d312d6b5b722d5d322d6b5b72283d5d
-      6b5b722073647261776b636162207469206e7572203b203434312c3333
-      32203d20646565732072656464616c2063696e6f6d726168203a3a2065
-      7564697365722046444b2d4846
-———————————————————————————————————————————————————————————————
-```

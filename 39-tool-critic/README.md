@@ -1,5 +1,8 @@
 # Tool-Use Critic — Independent Pre-Execution Validator
 
+
+*Part of the [research/ index](../README.md) — see [Start Here](../README.md#start-here) for the recommended reading order.*
+
 ## Problem
 
 An LLM that emits tool calls is, from a security standpoint, an untrusted code generator. It can be steered by prompt injection in retrieved content, it can hallucinate arguments, it can call a high-stakes tool with the risk profile of a low one, and it can simply get the arguments wrong. The authority-band engine (guide 37) decides *whether a tool may auto-execute*, but it does not look at *the call itself* — the specific arguments, whether required fields are present, whether the arguments contain an injection payload, or whether the call's declared risk class is consistent with the band it was assigned.

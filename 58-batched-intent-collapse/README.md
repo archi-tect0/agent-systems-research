@@ -1,5 +1,8 @@
 # Batched Intent Collapse with Merkle Fan-Out
 
+
+*Part of the [research/ index](../README.md) — see [Start Here](../README.md#start-here) for the recommended reading order.*
+
 ## Problem
 
 A busy agent runtime resolves many independent requests against a large language model. In practice, most of those requests share the same heavy preamble: a system prompt, a tool schema, a compression dictionary, a snapshot of world state. When each request is sent on its own, that preamble is re-transmitted once per request. For N requests with a shared context of size C and per-request deltas of size d, the input cost is roughly `N × (C + d)` even though only `C + N × d` is genuinely distinct.

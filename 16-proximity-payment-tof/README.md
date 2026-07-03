@@ -1,5 +1,8 @@
 # Time-of-Flight Proximity Payment ("Tap to Pay", relay-resistant)
 
+
+*Part of the [research/ index](../README.md) — see [Start Here](../README.md#start-here) for the recommended reading order.*
+
 ## Problem
 
 Two people standing next to each other want to exchange value by physically tapping their phones together — the wallet equivalent of a contactless card. The natural transport is a short-range radio: **Web Bluetooth GATT** or **Web NFC (NDEF)**. Both expose an attractive property — they only work over a few centimetres — so it is tempting to treat "the radio connected" as proof that the two devices are in the same place.

@@ -1,5 +1,8 @@
 # Hybrid RSA + Post-Quantum OIDC Token Signing
 
+
+*Part of the [research/ index](../README.md) — see [Start Here](../README.md#start-here) for the recommended reading order.*
+
 ## Problem
 
 An OpenID Connect provider signs ID tokens with RS256 (RSA + SHA-256). RSA is not quantum-resistant: a sufficiently large quantum computer running Shor's algorithm could recover the RSA private key from its public key and forge tokens at will. Migrating an existing OIDC deployment to a post-quantum signature scheme is awkward because the entire relying-party ecosystem only understands RS256 — flipping the `alg` to a PQC algorithm overnight would break every client that has not been upgraded.

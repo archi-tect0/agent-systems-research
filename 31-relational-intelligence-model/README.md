@@ -1,5 +1,8 @@
 # Relational Intelligence Model
 
+
+*Part of the [research/ index](../README.md) — see [Start Here](../README.md#start-here) for the recommended reading order.*
+
 ## Problem
 
 A long-lived personal agent talks to the *same* person across hundreds of sessions. A stateless agent treats every turn as if it met the user for the first time: same verbosity, same tone, same proactivity, whether it is turn 1 or turn 1,000, whether the user is relaxed or visibly stressed. That feels robotic and, worse, mis-calibrated — it lectures a power user who wants one line, and it is curt with a new user who needs hand-holding.

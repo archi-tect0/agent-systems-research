@@ -27,21 +27,15 @@ export type ReflectionCategory =
   | "milestone";
 
 export interface ReflectiveEntry {
-  id:           string;
-  wallet:       string;
-  category:     ReflectionCategory;
-  content:      string;
-  confidence:   number;
-  confirmed:    boolean;
-  source:       string;
-  updatedAt:    Date;
-  archivedAt:   Date | null;
-  /**
-   * Self-referential pointer for contradiction handling. When a new reflection
-   * overrides an older, contradictory one, the new row records the old row's id
-   * here and the old row is soft-archived in the same step. Null for originals.
-   */
-  supersedesId: string | null;
+  id:         string;
+  wallet:     string;
+  category:   ReflectionCategory;
+  content:    string;
+  confidence: number;
+  confirmed:  boolean;
+  source:     string;
+  updatedAt:  Date;
+  archivedAt: Date | null;
 }
 
 // Display priority for the per-turn context block: corrections lead, self-audits
@@ -73,34 +67,26 @@ export interface ReflectionStore {
 export async function addReflection(
   store: ReflectionStore,
   input: {
-    wallet:       string;
-    category:     ReflectionCategory;
-    content:      string;
-    confidence?:  number;
-    source?:      string;
-    confirmed?:   boolean;
-    /** If set, the new entry supersedes this id, which is soft-archived. */
-    supersedesId?: string;
+    wallet:     string;
+    category:   ReflectionCategory;
+    content:    string;
+    confidence?:number;
+    source?:    string;
+    confirmed?: boolean;
   },
 ): Promise<ReflectiveEntry> {
   const entry: ReflectiveEntry = {
-    id:           randomUUID(),
-    wallet:       input.wallet,
-    category:     input.category,
-    content:      input.content,
-    confidence:   input.confidence ?? 0.9,
-    confirmed:    input.confirmed ?? false,
-    source:       input.source ?? "agent_inference",
-    updatedAt:    new Date(),
-    archivedAt:   null,
-    supersedesId: input.supersedesId ?? null,
+    id:         randomUUID(),
+    wallet:     input.wallet,
+    category:   input.category,
+    content:    input.content,
+    confidence: input.confidence ?? 0.9,
+    confirmed:  input.confirmed ?? false,
+    source:     input.source ?? "agent_inference",
+    updatedAt:  new Date(),
+    archivedAt: null,
   };
   await store.insert(entry);
-  // Soft-archive the contradicted entry in the same step. Never a hard delete:
-  // the superseded row stays queryable via the supersedesId back-pointer.
-  if (input.supersedesId) {
-    await store.archiveOne(input.wallet, input.supersedesId);
-  }
   return entry;
 }
 
@@ -123,11 +109,7 @@ export async function listReflections(
  *   2. Display order = those re-sorted by CATEGORY_PRIORITY, top CONTEXT_BLOCK_MAX.
  *
  * Reinforcement (bump) is fire-and-forget — never awaited — so it adds no
- * latency to the LLM turn. We bump the entire candidate set, not just the
- * displayed top-N: a warm, high-priority entry that always wins the category sort
- * would otherwise starve the warm-but-lower-priority entries below it (they were
- * relevant enough to load but never get their timestamp refreshed, so they cool
- * off and get pruned despite being actively considered every turn).
+ * latency to the LLM turn.
  */
 export async function getReflectiveContext(
   store: ReflectionStore,
@@ -146,12 +128,9 @@ export async function getReflectiveContext(
   );
   const top = sorted.slice(0, CONTEXT_BLOCK_MAX);
 
-  // Use-reinforcement: bump the entire candidate set (everything warm enough to
-  // be considered this turn), not just the displayed top-N — otherwise entries
-  // that consistently lose the category-priority cut would starve and be pruned
-  // despite being relevant every turn. Fire-and-forget so it adds no latency.
-  if (entries.length > 0) {
-    void store.bump(entries.map(e => e.id)).catch(() => {});
+  // Use-reinforcement: bump only the entries we are injecting. Fire-and-forget.
+  if (top.length > 0) {
+    void store.bump(top.map(e => e.id)).catch(() => {});
   }
 
   const lines = ["\nREFLECTIVE:"];
@@ -267,17 +246,5 @@ if (process.argv[2] === "--demo") {
     console.log(`\nDecay pass archived ${archived} cold unconfirmed reflection(s).`);
     console.log("\nContext block (after decay):");
     console.log(await getReflectiveContext(store, wallet));
-
-    // Contradiction handling: a later cycle learns the user now prefers detail,
-    // superseding the earlier "prefers code examples" lesson. The new entry
-    // back-points at the old one, which is soft-archived in the same step.
-    const superseding = await addReflection(store, {
-      wallet, category: "lesson",
-      content: "the user now prefers detailed prose walkthroughs",
-      supersedesId: lesson.id,
-    });
-    console.log(`\nSuperseded ${lesson.id} -> ${superseding.id} (supersedesId=${superseding.supersedesId}).`);
-    const live = await listReflections(store, wallet, "lesson");
-    console.log("Live lessons after supersede:", live.map(e => e.content));
   })();
 }

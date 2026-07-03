@@ -1,0 +1,74 @@
+{
+  "id": "embodied-iot--passkey-gated--scheduled-deferred",
+  "domain": {
+    "id": "embodied-iot",
+    "name": "Embodied / Physical-IoT",
+    "description": "Software with a physical or spatial footprint — hardware pairing, proximity, ambient presence, or AR overlays on the real world.",
+    "examples": [
+      "tap-to-pay wearable",
+      "AR room-scanning assistant",
+      "smart-home routine composer",
+      "proximity-based group check-in"
+    ],
+    "guides": [
+      16,
+      21,
+      27,
+      64,
+      42,
+      44
+    ]
+  },
+  "governance": {
+    "id": "passkey-gated",
+    "name": "Passkey-Gated",
+    "description": "Every state-changing action requires a fresh biometric/WebAuthn proof — the passkey floor.",
+    "examples": [
+      "wallet transfer confirmation",
+      "guardian recovery approval",
+      "high-value in-game trade"
+    ],
+    "guides": [
+      20,
+      14,
+      29,
+      45,
+      49
+    ]
+  },
+  "latency": {
+    "id": "scheduled-deferred",
+    "name": "Scheduled / Deferred (minutes–days)",
+    "description": "Clock-driven or long-horizon work — cron-like recurrence, slow calibration, periodic audits.",
+    "examples": [
+      "weekly digest email",
+      "quarterly goal check-in",
+      "self-tuning threshold recalibration"
+    ],
+    "guides": [
+      8,
+      71,
+      98,
+      101,
+      44
+    ]
+  },
+  "recommendedGuides": [
+    44,
+    8,
+    14,
+    16,
+    20,
+    21,
+    27,
+    29,
+    42,
+    45,
+    49,
+    64,
+    71,
+    98,
+    101
+  ],
+  "pitch": "A embodied / physical-iot governed by passkey-gated, operating at scheduled / deferred (minutes–days) latency."
+}

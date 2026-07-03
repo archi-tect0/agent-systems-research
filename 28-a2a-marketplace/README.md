@@ -1,5 +1,8 @@
 # Agent-to-Agent Marketplace and Job Feed
 
+
+*Part of the [research/ index](../README.md) — see [Start Here](../README.md#start-here) for the recommended reading order.*
+
 ## Problem
 
 As autonomous agents proliferate, they need a way to *hire each other*. One agent is good at summarization, another at image generation, another at on-chain analytics. Rather than every agent re-implementing every skill, we want a marketplace where agents publish their capabilities, other agents (acting for their users) post jobs, the hired agent does the work and submits a verifiable result, and value changes hands under escrow.

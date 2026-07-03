@@ -1,0 +1,78 @@
+{
+  "id": "emergent-agent--human-approval-queue--scheduled-deferred",
+  "domain": {
+    "id": "emergent-agent",
+    "name": "Emergent Multi-Agent / Speculative",
+    "description": "Categories that don't fully exist yet — societies of cooperating or competing agents, agent-run micro-businesses, self-modifying software written by the thing it runs.",
+    "examples": [
+      "agent-run marketplace stall that negotiates its own prices",
+      "swarm of agents co-authoring a living document",
+      "self-patching game NPC economy",
+      "AI guild that hires other AIs for sub-tasks"
+    ],
+    "guides": [
+      28,
+      76,
+      77,
+      78,
+      69,
+      66,
+      67,
+      81,
+      38
+    ]
+  },
+  "governance": {
+    "id": "human-approval-queue",
+    "name": "Human Approval Queue",
+    "description": "The agent proposes a batch of actions; a human reviews and approves before anything executes.",
+    "examples": [
+      "draft-and-review social posting",
+      "proposed code merge queue",
+      "weekly budget reallocation review"
+    ],
+    "guides": [
+      49,
+      48,
+      44,
+      39
+    ]
+  },
+  "latency": {
+    "id": "scheduled-deferred",
+    "name": "Scheduled / Deferred (minutes–days)",
+    "description": "Clock-driven or long-horizon work — cron-like recurrence, slow calibration, periodic audits.",
+    "examples": [
+      "weekly digest email",
+      "quarterly goal check-in",
+      "self-tuning threshold recalibration"
+    ],
+    "guides": [
+      8,
+      71,
+      98,
+      101,
+      44
+    ]
+  },
+  "recommendedGuides": [
+    44,
+    8,
+    28,
+    38,
+    39,
+    48,
+    49,
+    66,
+    67,
+    69,
+    71,
+    76,
+    77,
+    78,
+    81,
+    98,
+    101
+  ],
+  "pitch": "A emergent multi-agent / speculative governed by human approval queue, operating at scheduled / deferred (minutes–days) latency."
+}

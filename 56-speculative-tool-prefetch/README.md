@@ -1,5 +1,8 @@
 # Speculative Tool Prefetch from Stream Heads
 
+
+*Part of the [research/ index](../README.md) — see [Start Here](../README.md#start-here) for the recommended reading order.*
+
 ## Problem
 
 An agent runtime that lets a language model call tools usually runs in phases: the model streams its response, then — once generation is far enough along — a dispatch phase parses out the tool calls and executes them. Those tools (read a vault entry, recall a memory, run a search) often involve I/O with real latency. Because dispatch is serial after generation, the user waits for the model to finish *and then* waits again for the tool round-trip. On common repeated paths that second wait is pure dead time.

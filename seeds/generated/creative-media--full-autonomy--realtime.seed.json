@@ -1,0 +1,77 @@
+{
+  "id": "creative-media--full-autonomy--realtime",
+  "domain": {
+    "id": "creative-media",
+    "name": "Creative / Generative Media",
+    "description": "Tools that generate or remix art, music, video, or 3D scenes — the agent's output *is* the product, not just a means to an action.",
+    "examples": [
+      "AI album cover generator",
+      "procedural music composer",
+      "text-to-3D scene builder",
+      "style-transfer video editor"
+    ],
+    "guides": [
+      30,
+      54,
+      61,
+      63,
+      35,
+      5
+    ]
+  },
+  "governance": {
+    "id": "full-autonomy",
+    "name": "Full Autonomy",
+    "description": "The agent acts unsupervised within its declared authority band — no per-action human gate.",
+    "examples": [
+      "background inbox triage",
+      "auto-adjusting thermostat schedule",
+      "self-balancing game difficulty"
+    ],
+    "guides": [
+      37,
+      38,
+      22,
+      70,
+      78,
+      17
+    ]
+  },
+  "latency": {
+    "id": "realtime",
+    "name": "Real-Time (<100ms)",
+    "description": "Synchronous interaction loop where the agent must respond within a frame or a breath — games, AR, voice.",
+    "examples": [
+      "live game opponent",
+      "voice-interrupt assistant",
+      "AR overlay that tracks head movement"
+    ],
+    "guides": [
+      11,
+      57,
+      65,
+      83,
+      56
+    ]
+  },
+  "recommendedGuides": [
+    5,
+    11,
+    17,
+    22,
+    30,
+    35,
+    37,
+    38,
+    54,
+    56,
+    57,
+    61,
+    63,
+    65,
+    70,
+    78,
+    83
+  ],
+  "pitch": "A creative / generative media governed by full autonomy, operating at real-time (<100ms) latency."
+}

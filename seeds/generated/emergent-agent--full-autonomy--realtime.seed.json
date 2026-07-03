@@ -1,0 +1,81 @@
+{
+  "id": "emergent-agent--full-autonomy--realtime",
+  "domain": {
+    "id": "emergent-agent",
+    "name": "Emergent Multi-Agent / Speculative",
+    "description": "Categories that don't fully exist yet — societies of cooperating or competing agents, agent-run micro-businesses, self-modifying software written by the thing it runs.",
+    "examples": [
+      "agent-run marketplace stall that negotiates its own prices",
+      "swarm of agents co-authoring a living document",
+      "self-patching game NPC economy",
+      "AI guild that hires other AIs for sub-tasks"
+    ],
+    "guides": [
+      28,
+      76,
+      77,
+      78,
+      69,
+      66,
+      67,
+      81,
+      38
+    ]
+  },
+  "governance": {
+    "id": "full-autonomy",
+    "name": "Full Autonomy",
+    "description": "The agent acts unsupervised within its declared authority band — no per-action human gate.",
+    "examples": [
+      "background inbox triage",
+      "auto-adjusting thermostat schedule",
+      "self-balancing game difficulty"
+    ],
+    "guides": [
+      37,
+      38,
+      22,
+      70,
+      78,
+      17
+    ]
+  },
+  "latency": {
+    "id": "realtime",
+    "name": "Real-Time (<100ms)",
+    "description": "Synchronous interaction loop where the agent must respond within a frame or a breath — games, AR, voice.",
+    "examples": [
+      "live game opponent",
+      "voice-interrupt assistant",
+      "AR overlay that tracks head movement"
+    ],
+    "guides": [
+      11,
+      57,
+      65,
+      83,
+      56
+    ]
+  },
+  "recommendedGuides": [
+    38,
+    78,
+    11,
+    17,
+    22,
+    28,
+    37,
+    56,
+    57,
+    65,
+    66,
+    67,
+    69,
+    70,
+    76,
+    77,
+    81,
+    83
+  ],
+  "pitch": "A emergent multi-agent / speculative governed by full autonomy, operating at real-time (<100ms) latency."
+}

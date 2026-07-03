@@ -1,5 +1,8 @@
 # Autonomous Threat Response with a Safety Contract
 
+
+*Part of the [research/ index](../README.md) — see [Start Here](../README.md#start-here) for the recommended reading order.*
+
 ## Problem
 
 Once an AI agent can *observe* security telemetry, the next obvious step is to let it *act* on it — block a hostile IP, trip a circuit breaker on an abused route, freeze a misbehaving app, revoke a stolen session, rate-limit a wallet. Defensive automation closes the loop between detection and mitigation in seconds instead of minutes.

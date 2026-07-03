@@ -1,5 +1,8 @@
 # Intent-Gated Personal Knowledge Shards
 
+
+*Part of the [research/ index](../README.md) — see [Start Here](../README.md#start-here) for the recommended reading order.*
+
 ## Problem
 
 The memory systems in guides 06–07 are general-purpose: a salience-ranked pool of

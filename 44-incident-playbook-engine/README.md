@@ -1,5 +1,8 @@
 # Deterministic Incident Response Playbook Engine
 
+
+*Part of the [research/ index](../README.md) — see [Start Here](../README.md#start-here) for the recommended reading order.*
+
 ## Problem
 
 When a security incident is suspected — a drained account, a phishing message, a leaked key — the response should be fast, ordered, and consistent. Humans under stress skip steps, reorder them, or forget evidence collection. An autonomous agent has the opposite failure mode: without an explicit runbook it improvises, and improvised security actions are exactly the actions you do not want an agent taking on its own.

@@ -1,5 +1,8 @@
 # Competence-Gated On-Device Distillation Router
 
+
+*Part of the [research/ index](../README.md) — see [Start Here](../README.md#start-here) for the recommended reading order.*
+
 ## Problem
 
 A hybrid agent runs against two very different models: a large, expensive cloud model and a small, cheap, private on-device model. The naive approaches both fail. Routing everything to the cloud is costly, slow on first token, and leaks every turn off-device. Routing everything local burns trust the first time the small model botches a transaction or a security decision.

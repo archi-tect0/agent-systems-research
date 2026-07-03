@@ -1,0 +1,31 @@
+{
+  "name": "agent-kernel",
+  "version": "0.1.0",
+  "description": "A minimal, MIT-licensed kernel for agent runtimes: memory, tool routing, governance, wallet limits, and a world model. No framework, no product, no dependencies.",
+  "type": "module",
+  "license": "MIT",
+  "engines": {
+    "node": ">=24"
+  },
+  "exports": {
+    ".": "./src/kernel.ts"
+  },
+  "files": [
+    "src",
+    "README.md",
+    "LICENSE"
+  ],
+  "scripts": {
+    "demo": "node demo.ts"
+  },
+  "keywords": [
+    "agent",
+    "ai-agent",
+    "runtime",
+    "kernel",
+    "tool-routing",
+    "governance",
+    "memory",
+    "world-model"
+  ]
+}

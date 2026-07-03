@@ -1,0 +1,75 @@
+{
+  "id": "realtime-game--passkey-gated--realtime",
+  "domain": {
+    "id": "realtime-game",
+    "name": "Real-Time Game",
+    "description": "Multiplayer or single-player interactive entertainment where state must sync at sub-frame latency and the agent may be a player, narrator, or opponent.",
+    "examples": [
+      "co-op dungeon crawler with an AI dungeon master",
+      "1v1 card game with a bluffing AI opponent",
+      "shared-world sandbox",
+      "rhythm game with generative levels"
+    ],
+    "guides": [
+      11,
+      27,
+      57,
+      61,
+      63,
+      64,
+      65,
+      83
+    ]
+  },
+  "governance": {
+    "id": "passkey-gated",
+    "name": "Passkey-Gated",
+    "description": "Every state-changing action requires a fresh biometric/WebAuthn proof — the passkey floor.",
+    "examples": [
+      "wallet transfer confirmation",
+      "guardian recovery approval",
+      "high-value in-game trade"
+    ],
+    "guides": [
+      20,
+      14,
+      29,
+      45,
+      49
+    ]
+  },
+  "latency": {
+    "id": "realtime",
+    "name": "Real-Time (<100ms)",
+    "description": "Synchronous interaction loop where the agent must respond within a frame or a breath — games, AR, voice.",
+    "examples": [
+      "live game opponent",
+      "voice-interrupt assistant",
+      "AR overlay that tracks head movement"
+    ],
+    "guides": [
+      11,
+      57,
+      65,
+      83,
+      56
+    ]
+  },
+  "recommendedGuides": [
+    11,
+    57,
+    65,
+    83,
+    14,
+    20,
+    27,
+    29,
+    45,
+    49,
+    56,
+    61,
+    63,
+    64
+  ],
+  "pitch": "A real-time game governed by passkey-gated, operating at real-time (<100ms) latency."
+}

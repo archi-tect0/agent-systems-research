@@ -1,5 +1,8 @@
 # Work Dispatcher with Scoped Invocation Tokens
 
+
+*Part of the [research/ index](../README.md) — see [Start Here](../README.md#start-here) for the recommended reading order.*
+
 ## Problem
 
 A platform lets third-party apps invoke capabilities on behalf of a user — "summarize my calendar", "rebalance my portfolio", "render this scene". These capabilities run asynchronously: the app fires a request, a worker processes it later, and the result is delivered by webhook or poll. Two access-control problems appear immediately.

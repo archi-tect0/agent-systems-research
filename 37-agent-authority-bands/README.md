@@ -1,5 +1,8 @@
 # Tiered Authority Bands for Agent Tool Execution
 
+
+*Part of the [research/ index](../README.md) — see [Start Here](../README.md#start-here) for the recommended reading order.*
+
 ## Problem
 
 An autonomous agent that can call tools has a spectrum of capabilities: some are pure reads (check a balance, look up a price), some prepare an action without committing it, some perform bounded reversible writes, and some are irreversible and high-stakes (send funds, revoke a key, delete a vault). A flat "this tool needs approval / this one doesn't" lookup table does not scale, and worse, it leaks authority in two dangerous ways:

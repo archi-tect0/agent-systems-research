@@ -1,5 +1,8 @@
 # World-Model & Belief State
 
+
+*Part of the [research/ index](../README.md) — see [Start Here](../README.md#start-here) for the recommended reading order.*
+
 *One place where the agent keeps what it believes about the world and how sure it is — folding noisy evidence into calibrated confidence, catching beliefs that contradict each other, repairing them by weight, and predicting an action's effect on a clone before committing to it.*
 
 The typed world-model graph ([guide 46](../46-typed-world-model-graph/)) gives the agent a *structure* for facts. The counterfactual simulator ([guide 72](../72-counterfactual-simulation/)) dry-runs a *plan* against a clone of that structure. The calibrated uncertainty engine ([guide 68](../68-calibrated-uncertainty-engine/)) turns one claim into a confidence. This guide is where those three meet: a single belief state that holds facts *with* confidence, updates them from evidence, keeps them internally consistent, and projects them forward.

@@ -1,0 +1,77 @@
+{
+  "id": "consumer-app--quorum-consensus--async-background",
+  "domain": {
+    "id": "consumer-app",
+    "name": "Consumer App",
+    "description": "Everyday utility and productivity software — the agent reads/writes structured personal data and calls a modest set of well-known tools.",
+    "examples": [
+      "habit tracker",
+      "personal finance dashboard",
+      "note-taking app",
+      "meal planner",
+      "travel itinerary builder"
+    ],
+    "guides": [
+      9,
+      12,
+      37,
+      49,
+      68,
+      8,
+      10,
+      60,
+      71
+    ]
+  },
+  "governance": {
+    "id": "quorum-consensus",
+    "name": "Quorum / Consensus",
+    "description": "Multiple parties — agents and/or humans — must agree before an action lands.",
+    "examples": [
+      "family shared-vault withdrawal",
+      "guild treasury spend",
+      "multi-agent negotiation settlement"
+    ],
+    "guides": [
+      29,
+      32,
+      76,
+      49
+    ]
+  },
+  "latency": {
+    "id": "async-background",
+    "name": "Async / Background (seconds–minutes)",
+    "description": "Work that runs off the interaction thread and reports back — jobs, pipelines, batch tool chains.",
+    "examples": [
+      "nightly portfolio rebalance job",
+      "batch image upscaling queue",
+      "multi-step research report generator"
+    ],
+    "guides": [
+      8,
+      26,
+      55,
+      58,
+      71
+    ]
+  },
+  "recommendedGuides": [
+    8,
+    49,
+    71,
+    9,
+    10,
+    12,
+    26,
+    29,
+    32,
+    37,
+    55,
+    58,
+    60,
+    68,
+    76
+  ],
+  "pitch": "A consumer app governed by quorum / consensus, operating at async / background (seconds–minutes) latency."
+}

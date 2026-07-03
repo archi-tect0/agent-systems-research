@@ -1,0 +1,79 @@
+{
+  "id": "consumer-app--human-approval-queue--realtime",
+  "domain": {
+    "id": "consumer-app",
+    "name": "Consumer App",
+    "description": "Everyday utility and productivity software — the agent reads/writes structured personal data and calls a modest set of well-known tools.",
+    "examples": [
+      "habit tracker",
+      "personal finance dashboard",
+      "note-taking app",
+      "meal planner",
+      "travel itinerary builder"
+    ],
+    "guides": [
+      9,
+      12,
+      37,
+      49,
+      68,
+      8,
+      10,
+      60,
+      71
+    ]
+  },
+  "governance": {
+    "id": "human-approval-queue",
+    "name": "Human Approval Queue",
+    "description": "The agent proposes a batch of actions; a human reviews and approves before anything executes.",
+    "examples": [
+      "draft-and-review social posting",
+      "proposed code merge queue",
+      "weekly budget reallocation review"
+    ],
+    "guides": [
+      49,
+      48,
+      44,
+      39
+    ]
+  },
+  "latency": {
+    "id": "realtime",
+    "name": "Real-Time (<100ms)",
+    "description": "Synchronous interaction loop where the agent must respond within a frame or a breath — games, AR, voice.",
+    "examples": [
+      "live game opponent",
+      "voice-interrupt assistant",
+      "AR overlay that tracks head movement"
+    ],
+    "guides": [
+      11,
+      57,
+      65,
+      83,
+      56
+    ]
+  },
+  "recommendedGuides": [
+    49,
+    8,
+    9,
+    10,
+    11,
+    12,
+    37,
+    39,
+    44,
+    48,
+    56,
+    57,
+    60,
+    65,
+    68,
+    71,
+    83
+  ],
+  "pitch": "A consumer app governed by human approval queue, operating at real-time (<100ms) latency."
+}

@@ -1,5 +1,8 @@
 # Session Static Manifest (SSM)
 
+
+*Part of the [research/ index](../README.md) — see [Start Here](../README.md#start-here) for the recommended reading order.*
+
 ## Problem
 
 Every LLM session has two distinct components in its context window:
@@ -21,9 +24,6 @@ At server boot, concatenate all static blobs (system prompt, knowledge base, too
 **Per-session hash tracking.**  
 Store a short SHA-256 hash of the static portion per active conversation. When building a prompt, recompute the hash and compare. If it matches, attach `cache_control: {"type": "ephemeral"}` to the Anthropic message or use the cached Gemini context name. If it doesn't match (a capability grant was added or revoked mid-session), skip the cache and invalidate the external provider cache.
 
-**Cache breakpoint ordering (static before volatile).**  
-Provider prompt caches (Anthropic `cache_control`, Gemini context caching) only hit when the bytes *before* the breakpoint are byte-identical across requests. The static blob is immutable, so it sits first and carries the cache marker; the SQ-B codec dictionary (guide 03) mutates every turn as live scores shift, so it must live in the dynamic suffix *after* the breakpoint. Folding the volatile codec block into the cached prefix changes those bytes every turn and silently disables the cache — the opposite of the intent.
-
 **Cap at 512 live sessions.**  
 The SSM map is in-process memory. At 512 entries (two small integers per entry), this is negligible. The cap prevents unbounded growth if conversations are never explicitly closed — evict the oldest entry on overflow.
 
@@ -39,9 +39,8 @@ global_seed_text = static_seed
 
 // First turn of a new session
 if not ssm[conv_id].seeded:
-  repeat anchor_weight (=3) times:           // seed at frequency ≈ 3 (gravity well)
-    for chunk in chunks(global_seed_text, 3000 chars):
-      session_symbol_table.ingest(chunk)
+  for chunk in chunks(global_seed_text, 3000 chars):
+    session_symbol_table.ingest(chunk)
   ssm[conv_id].seeded = true
 
 // Every turn (for provider caching)
@@ -55,7 +54,7 @@ if ssm[conv_id].hash != static_hash:
 
 The global seed pre-populates each session's symbol table with phrases from the static blobs. This means phrases like "the user's wallet address" or "tool: navigate_to" — which appear in the system prompt and will also appear in conversation turns — are already in the vocabulary with high byte-savings scores. When the conversation starts and these phrases appear in user messages and model responses, the symbol table treats them as high-frequency candidates immediately rather than waiting for them to accumulate frequency naturally.
 
-A subtlety in scoring: pre-seeded entries are populated at boot, so their `lastUsedMs` is the boot timestamp. SQ-B's recency term (`1 / (1 + age/60s)`) decays that contribution toward zero within a few minutes — well before a user is deep into a session. If those entries also started at `frequency=1`, a fast-moving conversation could out-score them (a freshly seen phrase has frequency 1 *and* recency ≈ 1) and evict critical structural terms — tool schemas, JSON formatting rules — before the model ever uses them. To prevent this, `preSeedSymbolTable` ingests the seed `anchorWeight` times (default 3), so pre-seeded phrases enter at frequency ≈ 3. Since frequency is the dominant scoring term (×0.6), this acts as an "artificial gravity well" that keeps the static vocabulary anchored until it is either referenced natively or genuinely stale.
+The pre-seeded entries start with `frequency=1` (from the boot ingest), so they rank lower than phrases that have appeared multiple times in the live conversation. But they still pass the entropy gate and occupy table slots, ready to be promoted when they recur.
 
 ## How it enables provider prompt caching
 
@@ -64,18 +63,13 @@ A subtlety in scoring: pre-seeded entries are populated at boot, so their `lastU
 const staticHash = hashStaticBlob(systemPrompt + knowledgeBlob);
 
 if (staticHashMatches(convId, staticHash)) {
-  // The static prefix hasn't changed — safe to use cached version.
-  // CRITICAL ordering: the immutable static block carries cache_control and comes
-  // first. The SQ-B codec block (guide 03) changes every turn as live scores shift,
-  // so it MUST sit in the dynamic suffix AFTER the cache breakpoint. Placing the
-  // volatile codec block before/inside the cached block changes the cached prefix's
-  // bytes every turn and silently destroys the cache hit.
+  // The static prefix hasn't changed — safe to use cached version
   messages = [
     {
       role: "user",
       content: [
-        { type: "text", text: systemPrompt, cache_control: { type: "ephemeral" } }, // cached, byte-identical
-        { type: "text", text: codecBlock + "\n\n" + dynamicContext },               // volatile — never cached
+        { type: "text", text: systemPrompt, cache_control: { type: "ephemeral" } },
+        { type: "text", text: dynamicContext },
       ],
     },
     ...conversationHistory,

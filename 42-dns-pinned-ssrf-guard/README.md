@@ -1,5 +1,8 @@
 # DNS-Pinned SSRF Guard for Outbound Webhooks
 
+
+*Part of the [research/ index](../README.md) — see [Start Here](../README.md#start-here) for the recommended reading order.*
+
 ## Problem
 
 A service that lets users register an outbound webhook URL — "POST here when something happens" — is handing an attacker a server-side request primitive. If the validation is naive, the attacker registers a URL that points at infrastructure the *server* can reach but the *outside world* cannot: `http://127.0.0.1:6379`, `http://10.0.0.5/admin`, or the cloud metadata endpoint `http://169.254.169.254/latest/meta-data/iam/...`. This is Server-Side Request Forgery (SSRF), and the metadata-endpoint variant has been the root cause of several large cloud breaches because it can hand out short-lived IAM credentials to anyone who can make the instance fetch a URL.

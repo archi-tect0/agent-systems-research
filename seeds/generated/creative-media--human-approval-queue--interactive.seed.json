@@ -1,0 +1,73 @@
+{
+  "id": "creative-media--human-approval-queue--interactive",
+  "domain": {
+    "id": "creative-media",
+    "name": "Creative / Generative Media",
+    "description": "Tools that generate or remix art, music, video, or 3D scenes — the agent's output *is* the product, not just a means to an action.",
+    "examples": [
+      "AI album cover generator",
+      "procedural music composer",
+      "text-to-3D scene builder",
+      "style-transfer video editor"
+    ],
+    "guides": [
+      30,
+      54,
+      61,
+      63,
+      35,
+      5
+    ]
+  },
+  "governance": {
+    "id": "human-approval-queue",
+    "name": "Human Approval Queue",
+    "description": "The agent proposes a batch of actions; a human reviews and approves before anything executes.",
+    "examples": [
+      "draft-and-review social posting",
+      "proposed code merge queue",
+      "weekly budget reallocation review"
+    ],
+    "guides": [
+      49,
+      48,
+      44,
+      39
+    ]
+  },
+  "latency": {
+    "id": "interactive",
+    "name": "Interactive (sub-second)",
+    "description": "Conversational, turn-based UI latency — the user waits for one reply, not a stream of frames.",
+    "examples": [
+      "chat assistant",
+      "form-filling copilot",
+      "code review comment bot"
+    ],
+    "guides": [
+      12,
+      9,
+      50,
+      68,
+      40
+    ]
+  },
+  "recommendedGuides": [
+    5,
+    9,
+    12,
+    30,
+    35,
+    39,
+    40,
+    44,
+    48,
+    49,
+    50,
+    54,
+    61,
+    63,
+    68
+  ],
+  "pitch": "A creative / generative media governed by human approval queue, operating at interactive (sub-second) latency."
+}

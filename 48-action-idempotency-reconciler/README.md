@@ -1,5 +1,8 @@
 # Agent Action Idempotency Reconciler
 
+
+*Part of the [research/ index](../README.md) — see [Start Here](../README.md#start-here) for the recommended reading order.*
+
 ## Problem
 
 An autonomous agent that proposes write actions — send funds, post a message, schedule a job — does not behave like a deterministic function. It re-plans. A language model that just produced a "send 5 USDC to 0xdead" proposal may, two reasoning steps later, conclude it should send 5 USDC to 0xdead and emit the proposal *again*. Without a guard, each proposal mints a fresh confirmation card, and the user is staring at three identical "approve this transfer?" prompts. Worse, if they tap two of them, the action executes twice.

@@ -1,5 +1,8 @@
 # Wallet-to-Wallet End-to-End Encrypted Messaging
 
+
+*Part of the [research/ index](../README.md) — see [Start Here](../README.md#start-here) for the recommended reading order.*
+
 ## Problem
 
 We want a private messaging system addressed by wallet, not by email or phone. Two users with wallet keypairs should be able to exchange messages that the server *cannot read* — true end-to-end encryption — while the server still does the unglamorous work of storing messages, maintaining inbox/sent/archive/trash folders, tracking read state, and surfacing a contacts list.

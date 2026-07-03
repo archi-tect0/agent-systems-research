@@ -1,5 +1,8 @@
 # Onion-Layered Multi-Hop Transport
 
+
+*Part of the [research/ index](../README.md) — see [Start Here](../README.md#start-here) for the recommended reading order.*
+
 ## Problem
 
 When two parties communicate through a network of relays, each relay is a potential observer. A naive relay sees the full message, the original sender, and the final destination. Even if the payload is encrypted end to end, the relay still learns the metadata — who is talking to whom — which is often as sensitive as the content itself.
