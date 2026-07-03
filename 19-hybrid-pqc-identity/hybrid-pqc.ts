@@ -33,18 +33,23 @@ const SERVER_SECRET = Buffer.from(
 
 export type PqAlg = "ML-DSA-65" | "SLH-DSA-SHA2-128s";
 
-const ALGS: Record<PqAlg, { keygen: (seed: Uint8Array) => { publicKey: Uint8Array; secretKey: Uint8Array };
+const ALGS: Record<PqAlg, { seedLen: number;
+                            keygen: (seed: Uint8Array) => { publicKey: Uint8Array; secretKey: Uint8Array };
                             sign: (sk: Uint8Array, msg: Uint8Array) => Uint8Array;
                             verify: (pk: Uint8Array, msg: Uint8Array, sig: Uint8Array) => boolean; }> = {
   "ML-DSA-65": {
+    seedLen: 32, // ml_dsa65.lengths.seed
     keygen: (s) => ml_dsa65.keygen(s),
-    sign: (sk, m) => ml_dsa65.sign(sk, m),
-    verify: (pk, m, sig) => ml_dsa65.verify(pk, m, sig),
+    // @noble/post-quantum's sign/verify take (message, key), not (key, message) —
+    // reordered here so the rest of this file can use a consistent (key, message) wrapper.
+    sign: (sk, m) => ml_dsa65.sign(m, sk),
+    verify: (pk, m, sig) => ml_dsa65.verify(sig, m, pk),
   },
   "SLH-DSA-SHA2-128s": {
+    seedLen: 48, // slh_dsa_sha2_128s.lengths.seed — NOT 32; differs from ML-DSA
     keygen: (s) => slh_dsa_sha2_128s.keygen(s),
-    sign: (sk, m) => slh_dsa_sha2_128s.sign(sk, m),
-    verify: (pk, m, sig) => slh_dsa_sha2_128s.verify(pk, m, sig),
+    sign: (sk, m) => slh_dsa_sha2_128s.sign(m, sk),
+    verify: (pk, m, sig) => slh_dsa_sha2_128s.verify(sig, m, pk),
   },
 };
 
@@ -60,7 +65,9 @@ function hardenedKdf(account: string, info: string, bytes: number): Buffer {
 }
 
 function keygenFor(account: string, alg: PqAlg) {
-  const seed = hardenedKdf(account, `pq-seed:${alg}:v1`, 32);
+  // Seed length is algorithm-specific — ML-DSA-65 wants 32 bytes, SLH-DSA-SHA2-128s
+  // wants 48. Using a fixed length for both throws a length-mismatch error.
+  const seed = hardenedKdf(account, `pq-seed:${alg}:v1`, ALGS[alg].seedLen);
   return ALGS[alg].keygen(new Uint8Array(seed));
 }
 
@@ -220,7 +227,7 @@ export async function signIdTokenHybrid(
   // PQ keypair derived from the current RSA kid — rotates automatically with it.
   const seed = hardenedKdf(`oidc:${rsaKid}`, "oidc-mldsa:v1", 32);
   const { secretKey } = ml_dsa65.keygen(new Uint8Array(seed));
-  const pqSig = ml_dsa65.sign(secretKey, new TextEncoder().encode(idToken));
+  const pqSig = ml_dsa65.sign(new TextEncoder().encode(idToken), secretKey);
 
   return { idToken, pqSig: Buffer.from(pqSig).toString("hex"), pqAlg: "ML-DSA-65", pqKid: `pq-${rsaKid}` };
 }
@@ -254,9 +261,9 @@ if (process.argv[2] === "--demo") {
     const rsa = crypto.generateKeyPairSync("rsa", { modulusLength: 2048 });
     const tok = await signIdTokenHybrid({ sub: account, aud: "client-1" }, rsa.privateKey.export({ type: "pkcs1", format: "pem" }) as string, "kid-1");
     const pqOk = ml_dsa65.verify(
-      Buffer.from(oidcPqJwk("kid-1").x, "base64url"),
-      new TextEncoder().encode(tok.idToken),
       Buffer.from(tok.pqSig, "hex"),
+      new TextEncoder().encode(tok.idToken),
+      Buffer.from(oidcPqJwk("kid-1").x, "base64url"),
     );
     console.log("oidc pq sig valid:", pqOk);
   })();

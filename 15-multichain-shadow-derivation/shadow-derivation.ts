@@ -16,17 +16,18 @@
  *
  * Dependencies:
  *   @noble/curves  — secp256k1, ed25519
- *   @noble/hashes  — keccak_256, ripemd160, sha256, base58, bech32
+ *   @noble/hashes  — keccak_256, ripemd160, sha256
+ *   @scure/base    — base58, bech32
  *   node:crypto    — hkdfSync
  */
 
 import crypto from "crypto";
-import { secp256k1 } from "@noble/curves/secp256k1";
-import { ed25519 } from "@noble/curves/ed25519";
-import { keccak_256 } from "@noble/hashes/sha3";
-import { sha256 } from "@noble/hashes/sha256";
-import { ripemd160 } from "@noble/hashes/legacy";
-import { base58, bech32 } from "@noble/hashes/utils";
+import { secp256k1 } from "@noble/curves/secp256k1.js";
+import { ed25519 } from "@noble/curves/ed25519.js";
+import { keccak_256 } from "@noble/hashes/sha3.js";
+import { sha256 } from "@noble/hashes/sha2.js";
+import { ripemd160 } from "@noble/hashes/legacy.js";
+import { base58, bech32 } from "@scure/base";
 
 // ── Core derivation ─────────────────────────────────────────────────────────
 

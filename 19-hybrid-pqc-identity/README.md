@@ -74,7 +74,9 @@ verify({payload, pqSig, pqAlg, ecdsaSig, account}):
 signIdTokenHybrid(payload):
   idToken = RS256_JWT(payload, rsaPrivateKey, kid)
   (pqPk, pqSk) = MLDSA.keygen( KDF(SERVER_SECRET, rsaKid, "oidc-mldsa") )
-  pqSig = MLDSA.sign(pqSk, utf8(idToken))     // covers the WHOLE RS256 token
+  pqSig = MLDSA.sign(utf8(idToken), pqSk)     // covers the WHOLE RS256 token
+                                               // (note: @noble/post-quantum's real
+                                               // sign() takes (message, secretKey))
   return { idToken, pqSig: hex, pqAlg: "ML-DSA-65", pqKid: "pq-"+rsaKid }
 ```
 

@@ -84,7 +84,8 @@ See [`shadow-derivation.ts`](./shadow-derivation.ts) in this directory.
 
 External dependencies (called out explicitly, all widely audited):
 - `@noble/curves` — secp256k1 and Ed25519 primitives
-- `@noble/hashes` — keccak-256, ripemd160, sha256, base58 / bech32 codecs
+- `@noble/hashes` — keccak-256, ripemd160, sha256
+- `@scure/base` — base58 / bech32 codecs
 - Node.js built-in `crypto` — `hkdfSync`
 
 The implementation uses `@noble/*` so it runs without `bitcoinjs-lib`, `ethers`, `@solana/web3.js`, or `tweetnacl`. In production those higher-level libraries are perfectly fine substitutes — the derivation constants and byte layout are what matter and are reproduced exactly here.
