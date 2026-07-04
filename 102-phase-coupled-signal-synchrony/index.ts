@@ -1,9 +1,10 @@
 // Guide 102 — Phase-Coupled Signal Synchrony (Kuramoto Model)
 //
 // A 5-node Kuramoto oscillator network that computes a composite synchrony
-// signal from phase coupling across five channels.
+// signal from phase coupling across five functional channels: salience,
+// memory, conflict, saturation, and regulation.
 
-type SignalNode = "salience" | "episodic" | "conflict" | "interoceptive" | "regulation";
+type SignalNode = "salience" | "memory" | "conflict" | "saturation" | "regulation";
 
 interface SignalNodeState {
   node: SignalNode;
@@ -26,22 +27,22 @@ interface DriveInputs {
   gInv: number;
 }
 
-const SIGNAL_NODES: SignalNode[] = ["salience", "episodic", "conflict", "interoceptive", "regulation"];
+const SIGNAL_NODES: SignalNode[] = ["salience", "memory", "conflict", "saturation", "regulation"];
 
 const OMEGA: Record<SignalNode, number> = {
   salience: 0.80,
-  episodic: 0.50,
+  memory: 0.50,
   conflict: 0.60,
-  interoceptive: 0.30,
+  saturation: 0.30,
   regulation: 0.20,
 };
 
 const K: Record<SignalNode, Record<SignalNode, number>> = {
-  salience: { salience: 0, episodic: 0.30, conflict: 0.20, interoceptive: 0.10, regulation: 0.15 },
-  episodic: { salience: 0.15, episodic: 0, conflict: 0.15, interoceptive: 0.10, regulation: 0.05 },
-  conflict: { salience: 0.10, episodic: 0.15, conflict: 0, interoceptive: 0.05, regulation: 0.25 },
-  interoceptive: { salience: 0.20, episodic: 0.10, conflict: 0.10, interoceptive: 0, regulation: 0.05 },
-  regulation: { salience: 0.10, episodic: 0.05, conflict: 0.15, interoceptive: 0.05, regulation: 0 },
+  salience: { salience: 0, memory: 0.30, conflict: 0.20, saturation: 0.10, regulation: 0.15 },
+  memory: { salience: 0.15, memory: 0, conflict: 0.15, saturation: 0.10, regulation: 0.05 },
+  conflict: { salience: 0.10, memory: 0.15, conflict: 0, saturation: 0.05, regulation: 0.25 },
+  saturation: { salience: 0.20, memory: 0.10, conflict: 0.10, saturation: 0, regulation: 0.05 },
+  regulation: { salience: 0.10, memory: 0.05, conflict: 0.15, saturation: 0.05, regulation: 0 },
 };
 
 function wrapPhase(theta: number): number {
@@ -69,9 +70,9 @@ function initSynchronyState(): SynchronyState {
 function tick(state: SynchronyState, inputs: DriveInputs): SynchronyState {
   const drives: Record<SignalNode, number> = {
     salience: Math.min(1, inputs.absVa) * 0.20,
-    episodic: Math.min(1, inputs.hS) * 0.10,
+    memory: Math.min(1, inputs.hS) * 0.10,
     conflict: Math.max(0, inputs.dhDt) * 0.30,
-    interoceptive: Math.min(1, inputs.sigmaSat) * 0.15,
+    saturation: Math.min(1, inputs.sigmaSat) * 0.15,
     regulation: Math.min(1, inputs.gInv) * 0.05,
   };
 

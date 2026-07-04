@@ -3,7 +3,7 @@
 
 *Part of the [research/ index](../README.md) — see [Start Here](../README.md#start-here) for the recommended reading order.*
 
-*A 5-node Kuramoto phase-coupling network that computes a synchrony order parameter as a composite arousal/emergence signal, with a fast/slow blend so a sudden high-salience input can spike the fast path without waiting for the whole ring to synchronize.*
+*A 5-node Kuramoto phase-coupling network that computes a synchrony order parameter (R_t) as a composite synchrony/urgency signal across five functional channels — salience, memory, conflict, saturation, and regulation — with a fast/slow blend so a sudden high-salience input can spike the fast path without waiting for the whole ring to synchronize.*
 
 ---
 
@@ -13,12 +13,10 @@ A single-scalar signal (e.g., `arousal = 0.8`) or a 2D point (valence/arousal) c
 
 ## Design decisions
 
-- **Five-node Kuramoto network**: Instead of one variable, we use five coupled oscillators representing five internal signal channels: salience, episodic-memory recall, conflict, interoceptive state, and regulation.
+- **Five-node Kuramoto network**: Instead of one variable, we use five coupled oscillators, one per functional channel: salience (priority/magnitude spikes), memory (session-entropy load), conflict (rate of change of entropy — how fast internal state is destabilizing), saturation (how close a resource is to its limit), and regulation (a stabilizing signal driven by invariant/identity integrity). Each name describes what the channel's input signal is, nothing more.
 - **Synchrony as a Composite Signal**: The global order parameter $R_t$ measures how unified the five channels are. A high $R_t$ marks a "synchrony event," where the channels lock into a single composite signal.
 - **Fast/Slow Blend**: The model derives two output components: $V_{fast}$ (driven by immediate phase jumps in the salience node) and $V_{slow}$ (a deliberate, ring-wide response).
 - **Exogenous Drives ($\eta_i$)**: Each node is sensitive to a different system input (e.g., entropy for the memory node, identity integrity for the regulation node), so the composite signal emerges from real operational metrics rather than being hand-set.
-
-> **Inspiration:** the five channel names are loosely modeled on salience/episodic/conflict/interoceptive/regulatory brain circuits (amygdala, hippocampus, ACC, insula, PFC) purely as a naming convenience for what each channel tracks. The model implements real Kuramoto phase-coupling dynamics, but makes no claim about affect, feeling, or consciousness.
 
 ## Algorithm
 
